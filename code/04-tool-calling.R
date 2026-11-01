@@ -105,8 +105,15 @@ readLines("shortlist.txt")
 
 ## Should the model be allowed to do that?
 
-# Writing to disk is a bigger deal than checking the time. Annotations let us
-# describe what a tool does...
+# Checking the time just reads something. Saving a file changes something on
+# our machine, and we might want a say in that. Annotations let us describe
+# what each tool does...
+time_tool <- tool(
+  get_time,
+  "Get the current date and time",
+  annotations = tool_annotations(read_only_hint = TRUE)
+)
+
 save_shortlist_tool <- tool(
   save_shortlist,
   "Save a shortlist of dog names to a text file",
@@ -114,7 +121,7 @@ save_shortlist_tool <- tool(
     names = type_array(type_string("Dog names")),
     path = type_string("File path to save to")
   ),
-  annotations = tool_annotations(destructive_hint = TRUE)
+  annotations = tool_annotations(read_only_hint = FALSE)
 )
 
 # ...and on_tool_request() runs before every tool call. Return nothing to
@@ -127,8 +134,8 @@ chat$register_tool(time_tool)
 chat$register_tool(save_shortlist_tool)
 
 chat$on_tool_request(function(request) {
-  # Harmless tools go straight through
-  if (!isTRUE(request@tool@annotations$destructive_hint)) {
+  # Read-only tools go straight through
+  if (isTRUE(request@tool@annotations$read_only_hint)) {
     return()
   }
 
@@ -150,7 +157,7 @@ chat$chat(
 chat$chat("Pick two adult dogs and save them to adults.txt")
 file.exists("adults.txt")
 
-# Harmless tools don't trigger the question
+# Read-only tools don't trigger the question
 chat$chat("what time is it?")
 
 ## Try it live
@@ -162,5 +169,5 @@ live_console(chat)
 # 1. Ask the assistant to save a different shortlist, and approve it this time
 # 2. Change the rule in on_tool_request() so saving is only ever allowed to
 #    files ending in ".txt", without asking
-# 3. Bonus: add a second destructive tool (e.g. one that deletes a file) and
-#    check the same approval hook protects it
+# 3. Bonus: log every tool call (name and arguments) to a data frame using
+#    on_tool_request(), so you can see what the model did during a chat

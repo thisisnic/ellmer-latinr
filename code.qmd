@@ -71,10 +71,4 @@ Script: [`code/04-tool-calling.R`](https://github.com/thisisnic/ellmer-latinr/bl
 
 1. Ask the assistant to save a different shortlist, and approve it this time
 2. Change the rule in `on_tool_request()` so saving is only ever allowed to files ending in `.txt`, without asking
-3. **Bonus:** add a second destructive tool (e.g. one that deletes a file) and check the same approval hook protects it
-
-## Wrapping up
-
-Thanks so much for coming along!  Please fill in the workshop feedback: <https://forms.gle/LG3VH2o5qcNBp6aLA>
-
-If you want to learn more about using LLMs in R, I've started a newsletter: <https://aifordatapeople.beehiiv.com/>
+3. **Bonus:** log every tool call (name and arguments) to a data frame using `on_tool_request()`, so you can see what the model did during a chat
