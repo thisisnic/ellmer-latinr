@@ -2,6 +2,9 @@
 
 ## LatinR 2026 Conference Workshop by Nic Crane
 
+**This repository is a work in progress and does not currently reflect the final materials**
+
+
 ### Workshop Overview
 
 The {ellmer} package allows you to work directly with LLMs in R. 
