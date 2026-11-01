@@ -4,9 +4,9 @@
 
 ### Workshop Overview
 
-LLMs can be massively useful in R workflows, when used in the right places and if you're aware of not only the benefits, but also the risks. In this hands-on workshop, you'll learn how to use LLMs programmatically in R, and come away with both the confidence to experiment and a working script that extracts data from unstructured text.
+The {ellmer} package allows you to work directly with LLMs in R. 
 
-We'll look at where LLMs can help, where they'll let you down, and techniques for making your results more trustworthy. You're going to leave with a practical sense of what's possible and where to be cautious.
+In this hands-on workshop, you'll learn how to use LLMs programmatically with {ellmer}, to extract data from unstructured text and create tools to help chatbots work with functions as directly from an R session.
 
 **What you'll learn:**
 
@@ -17,7 +17,7 @@ We'll look at where LLMs can help, where they'll let you down, and techniques fo
 
 ### Instructor
 
-[**Nic Crane**](https://niccrane.com) is an R educator and consultant.  They are passionate about open source, and learning and teaching all things R.
+[**Nic Crane**](https://niccrane.com) is an open source developer and R consultant.  They are passionate about open source, and learning and teaching all things R.
 
 ------------------------------------------------------------------------
 
