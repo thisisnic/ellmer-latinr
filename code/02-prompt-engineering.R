@@ -1,142 +1,56 @@
-# 2 - Prompt Engineering
+# 2 - Prompt Engineering (brief)
 # Using LLMs in R with ellmer - LatinR 2026
+# [OPTIONAL - cut if short on time; section 3 stands alone]
 
-## Load the data to work with
+library(ellmer)
+library(dplyr)
 
-library(tidyverse)
-movies <- read_csv("data/movies.csv")
+dogs <- readr::read_csv("data/dogs.csv")
 
-pride_synopsis <- movies |>
-  filter(title == "Pride") |>
-  pull(synopsis)
+dog_description <- dogs |>
+  slice(1) |>
+  pull(description)
 
-pride_synopsis
+dog_description
 
-## Ask questions
-
-chat <- chat_openrouter(model = "openai/gpt-6.1-terra")
-chat$chat("What year was this movie set in?", pride_synopsis)
-
-## The LLM is very chatty!
+## Without guidance the LLM is chatty and inconsistent
 
 chat <- chat_openrouter(model = "openai/gpt-6.1-terra")
-chat$chat("Summarise this movie:", pride_synopsis)
+chat$chat("Summarise this dog:", dog_description)
 
-## Setting the system prompt
+## A system prompt sets the ground rules for the whole conversation
 
-chat <- chat_openrouter(
-  model = "openai/gpt-6.1-terra",
-  system_prompt = "Respond in 35 words or fewer"
-)
-chat$chat("Summarise this movie:", pride_synopsis)
-chat$chat("tell me every character and what they do")
-
-## Run it again though...responses vary
-
-chat <- chat_openrouter(
-  model = "openai/gpt-6.1-terra",
-  system_prompt = "Respond in 35 words or fewer"
-)
-chat$chat("Summarise this movie:", pride_synopsis)
-
-## 1. Define a role - prompt
-
-prompt <- "You are a movie summariser whose job is to sum up the
-genre and themes of movies to help users decide if they want to watch.
-Respond in 50 words or fewer"
-
-chat <- chat_openrouter(
-  model = "openai/gpt-6.1-terra",
-  system_prompt = prompt
-)
-chat$chat("Summarise the movie: ", pride_synopsis)
-
-# if we run it again we get different output
-chat <- chat_openrouter(
-  model = "openai/gpt-6.1-terra",
-  system_prompt = prompt
-)
-chat$chat("Summarise the movie: ", pride_synopsis)
-
-##  2 - Defining the output format - prompt
-
-prompt <- "You are a movie summariser whose job is to sum up the
-genre and themes of movies to help users decide if they want to watch.
-Respond in 50 words or fewer
+prompt <- "You are a dog adoption assistant helping people find dogs to adopt.
+Summarise the dog description you are given to help potential adopters decide
+if the dog is a good fit for them. Respond in 50 words or fewer.
 
 ## Output format
 
-Plot outline: a 1 sentence description
-
-Genre: movie genre
-
-Setting: time and place
-"
+Name: the dog's name
+Summary: a 1 sentence description
+Age group: one of Baby, Young, Adult, Senior
+Likes and dislikes: what the dog does and doesn't enjoy"
 
 chat <- chat_openrouter(
   model = "openai/gpt-6.1-terra",
   system_prompt = prompt
 )
+chat$chat("Summarise this dog:", dog_description)
 
-chat$chat("Summarise the movie: ", pride_synopsis)
-
-## 3 - Getting more specific - prompt
-
-prompt <- "You are a movie summariser whose job is to sum up the
-genre and themes of movies to help users decide if they want to watch.
-Respond in 50 words or fewer
-
-## Output format
-
-Plot outline: a 1 sentence description
-
-Genre: movie genre (see choices below)
-
-Setting: time and place
-
-## Choices
-
-Possible movie genres to choose from: Action, Comedy, Drama,
-Horror, Science, Fiction, Thriller, Romance, Fantasy, Adventure, Documentary
-"
+## Run it again - the format holds, but the wording still varies
 
 chat <- chat_openrouter(
   model = "openai/gpt-6.1-terra",
   system_prompt = prompt
 )
+chat$chat("Summarise this dog:", dog_description)
 
-chat$chat("Summarise the movie: ", pride_synopsis)
-
-## 4 - Iterate - be more strongly worded - prompt
-
-prompt <- "You are a movie summariser whose job is to sum up the
-genre and themes of movies to help users decide if they want to watch.
-Respond in 50 words or fewer
-
-## Output format
-
-Plot outline: a 1 sentence description
-
-Genre: movie genre (see choices below)
-
-Setting: time and place
-
-## Choices
-
-You MUST only choose genres that appear on this list: Action, Comedy,
-Drama,  Horror, Science, Fiction, Thriller, Romance, Fantasy, Adventure,
-Documentary"
-
-chat <- chat_openrouter(
-  model = "openai/gpt-6.1-terra",
-  system_prompt = prompt
-)
-
-chat$chat("Summarise the movie: ", pride_synopsis)
+# Prompting gets you a long way: a role, a clear task, and an output format
+# are usually enough. But the result is still free text we'd have to parse.
+# In the next section we make the model return data instead.
 
 ## Your turn
 
-# 1. Pick a different movie from the movie dataset and run the "best"
-#    version of the prompt on it
-# 2. Update the prompt to also extract information about the movie's themes
-# 3. See if you can update it to show what YOU would want to see in a summary
+# 1. Pick a different dog from the dataset and run the prompt on it
+# 2. Add one more field to the output format that YOU would want to know
+#    before adopting a dog

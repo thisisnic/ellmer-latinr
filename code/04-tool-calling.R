@@ -1,85 +1,166 @@
 # 4 - Tool Calling
 # Using LLMs in R with ellmer - LatinR 2026
 
+library(ellmer)
+library(dplyr)
+
+## Client-side vs server-side tools
+
+# A tool is a function the model can ask to have run for it. There are two
+# kinds:
+#
+# SERVER-SIDE tools run on the provider's infrastructure. The model calls
+# them without R being involved. Web search is the most common example.
+#
+# CLIENT-SIDE tools are R functions on our machine. The model asks for them,
+# ellmer runs them, and sends the result back to the model.
+
+## Server-side: web search with ":online"
+
+# Without search, the model only knows what it learned in training...
+chat <- chat_openrouter(model = "openai/gpt-6.1-terra")
+chat$chat("Which dog breeds are most popular this year?")
+
+# ...with search, OpenRouter runs a web search before the model answers
+chat <- chat_openrouter(model = "openai/gpt-6.1-terra:online")
+chat$chat("Which dog breeds are most popular this year?")
+
+# The search happened on the provider's side. There is no tool call for
+# ellmer to run, so the turn just contains the answer
+chat$last_turn()
+
+## Where did that come from? Citations
+
+# OpenRouter returns the sources it used alongside the text. ellmer keeps the
+# raw API response in the turn's @json slot, so we can dig them out
+annotations <- chat$last_turn()@json$choices[[1]]$message$annotations
+length(annotations)
+str(annotations[[1]])
+
+citations <- bind_rows(lapply(annotations, function(a) {
+  tibble(title = a$url_citation$title, url = a$url_citation$url)
+}))
+citations
+
+## Client-side: your own R functions as tools
+
 # Define the function
-sample_movies <- function() {
-  read.csv("data/movies_with_genres.csv") |>
-    slice_sample(n = 1)
+get_time <- function() {
+  format(Sys.time(), "%A %d %B %Y, %H:%M")
 }
 
 # Create tool
-sample_movies_tool <- tool(
-  sample_movies,
-  description = "Randomly sample a movie from the dataset"
-)
+time_tool <- tool(get_time, "Get the current date and time")
 
-## Initialise a chat and register the tool
+# Without the tool the model has to guess...
+chat <- chat_openrouter(model = "openai/gpt-6.1-terra")
+chat$chat("what date is it right now?")
 
-prompt <- "You are a movie recommender bot designed to help users
-pick potential films to add to their watch list. Sample a
-random film and give the user a 20 word summary of it."
+# ...with the tool it asks ellmer to run our function
+chat$register_tool(time_tool)
+chat$chat("what date is it right now?")
+
+# Print the chat to see the tool request and result in the history
+chat
+
+## Giving the model our dog database
+
+# We don't need a tool to filter the data - we can just send the file
+prompt <- "You are a dog adoption assistant helping the user choose a dog
+from the listings they give you."
 
 chat <- chat_openrouter(
   model = "openai/gpt-6.1-terra",
   system_prompt = prompt
 )
 
-chat$register_tool(sample_movies_tool)
-
-## Use the tool!
-
-chat$chat("What movie should I watch this weekend?")
-
-## Update the function to filter the data
-
-movie_genres <- c(
-  "Action", "Comedy", "Drama", "Horror",
-  "Science Fiction", "Thriller", "Romance",
-  "Fantasy", "Adventure", "Documentary"
+chat$chat(
+  "Here are the dogs available:",
+  content_document_file("data/dogs_details.csv")
 )
+chat$chat("I live in a small flat and already have a dog. Which three would suit me?")
 
-sample_and_filter_movies <- function(genre_choice = movie_genres) {
-  read.csv("data/movies_with_genres.csv") |>
-    filter(genre %in% genre_choice) |>
-    slice_sample(n = 1)
+## A tool that changes things: save a shortlist to a file
+
+# Define the function - note it returns a string describing what it did
+save_shortlist <- function(names, path) {
+  writeLines(names, path)
+  paste("Saved", length(names), "dogs to", path)
 }
 
-## Define tool using updated function
-
-sample_and_filter_movies_tool <- tool(
-  sample_and_filter_movies,
-  description = "Randomly sample a movie from the dataset",
+# Create tool - this time with arguments the model has to supply
+save_shortlist_tool <- tool(
+  save_shortlist,
+  "Save a shortlist of dog names to a text file",
   arguments = list(
-    genre_choice = type_array(
-      type_enum(
-        values = movie_genres,
-        "Movie genres to choose from"
-      )
-    )
+    names = type_array(type_string("Dog names")),
+    path = type_string("File path to save to")
   )
 )
 
-## Register the updated tool
+chat$register_tool(save_shortlist_tool)
+chat$chat("Save those three to shortlist.txt")
 
-prompt <- "You are a movie recommender bot designed to help users
-pick potential films to add to their watch list. Sample a
-random film and give the user a 20 word summary of it.
-"
+readLines("shortlist.txt")
 
+## Should the model be allowed to do that?
+
+# Writing to disk is a bigger deal than checking the time. Annotations let us
+# describe what a tool does...
+save_shortlist_tool <- tool(
+  save_shortlist,
+  "Save a shortlist of dog names to a text file",
+  arguments = list(
+    names = type_array(type_string("Dog names")),
+    path = type_string("File path to save to")
+  ),
+  annotations = tool_annotations(destructive_hint = TRUE)
+)
+
+# ...and on_tool_request() runs before every tool call. Return nothing to
+# allow it, or call tool_reject() to block it.
 chat <- chat_openrouter(
   model = "openai/gpt-6.1-terra",
   system_prompt = prompt
 )
+chat$register_tool(time_tool)
+chat$register_tool(save_shortlist_tool)
 
-chat$register_tool(sample_and_filter_movies_tool)
+chat$on_tool_request(function(request) {
+  # Harmless tools go straight through
+  if (!isTRUE(request@tool@annotations$destructive_hint)) {
+    return()
+  }
 
-## Ask the question
+  cat("The model wants to run", request@name, "with arguments:\n")
+  str(request@arguments)
+
+  answer <- readline("Allow? (y/n) ")
+  if (tolower(answer) != "y") {
+    tool_reject("The user did not approve this action")
+  }
+})
+
+chat$chat(
+  "Here are the dogs available:",
+  content_document_file("data/dogs_details.csv")
+)
+
+# Answer "n" when asked - the model is told why, and carries on gracefully
+chat$chat("Pick two adult dogs and save them to adults.txt")
+file.exists("adults.txt")
+
+# Harmless tools don't trigger the question
+chat$chat("what time is it?")
+
+## Try it live
 
 live_console(chat)
 
-# What movie should I watch tonight? I like scifi!
-
 ## Your turn
 
-# 1. Try using the tool and ask different questions and see if you can get
-#    the LLM to call it repeatedly
+# 1. Ask the assistant to save a different shortlist, and approve it this time
+# 2. Change the rule in on_tool_request() so saving is only ever allowed to
+#    files ending in ".txt", without asking
+# 3. Bonus: add a second destructive tool (e.g. one that deletes a file) and
+#    check the same approval hook protects it

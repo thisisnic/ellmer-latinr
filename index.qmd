@@ -43,16 +43,17 @@ install.packages(c("ellmer", "dplyr", "readr", "tidyr", "usethis"))
 
 #### API keys
 
-You'll need an API key from an LLM provider.  You will have been sent this on the day of the workshop.
+You'll need an API key from an LLM provider. We'll be using [OpenRouter](https://openrouter.ai/), and you will be sent a key on the day of the workshop. In section 1 we'll add it to your `.Renviron` file as `OPENROUTER_API_KEY`.
 
 ### Workshop Schedule
 
 - Section 0: Welcome and Setup
 - Section 1: Getting Started with LLMs in R
-- Section 2: Prompt Engineering
+- Section 2: Prompt Engineering (brief)
 - Section 3: Structured Output
+- Break
 - Section 4: Tool Calling
-- Section 5: Wrap-up and Resources
+- Wrap-up and Resources
 
 ### Instructor
 

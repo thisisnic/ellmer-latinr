@@ -14,7 +14,7 @@ chat <- chat_openrouter(model = "openai/gpt-6.1-terra")
 
 library(ellmer)
 chat <- chat_openrouter(model = "openai/gpt-6.1-terra")
-chat$chat("What is the most popular LGBT movie of all time?
+chat$chat("What is the most popular dog breed in the world?
   Answer succinctly.")
 
 ## Turns
@@ -23,8 +23,8 @@ chat
 
 ## Continuing the conversation
 
-chat$chat("Who were the stars of that movie?")
-chat$chat("What year was it released?")
+chat$chat("What are they like to live with?")
+chat$chat("How long do they usually live?")
 chat
 
 ## Reset - just start a new chat
@@ -37,14 +37,8 @@ chat$chat("What were we saying earlier?")
 chat$chat("what date is it right now?")
 chat$chat("Are you sure about that?")
 
-## Giving the model web search - add ":online" to the model name
-
-chat <- chat_openrouter(model = "openai/gpt-6.1-terra:online")
-chat$chat("what date is it right now?")
-chat$chat("What LGBT movies are being released this month?")
-
 ## Your turn
 
 # 1. Set up your API key using usethis::edit_r_environ() + restart R
 # 2. Start a conversation: chat_openrouter(model = "openai/gpt-6.1-terra")
-# 3. Ask what the most popular LGBT movie was in 1995 and then 2026
+# 3. Ask what the most popular dog breed was in 1995 and then in 2026

@@ -24,12 +24,12 @@ unlink("ellmer-latinr-main", recursive = TRUE)
 
 # Code
 
-There is one R script per section of the workshop in the `code/` directory. Each script ends with the "Your turn" exercises for that section.
+There is one R script per section of the workshop in the `code/` directory. Each script ends with the "Your turn" exercises for that section. Section 2 is optional and may be skipped depending on time.
 
 | Section | Script |
 |---|---|
 | 1 - Getting Started with LLMs in R | [`code/01-getting-started.R`](https://github.com/thisisnic/ellmer-latinr/blob/main/code/01-getting-started.R) |
-| 2 - Prompt Engineering | [`code/02-prompt-engineering.R`](https://github.com/thisisnic/ellmer-latinr/blob/main/code/02-prompt-engineering.R) |
+| 2 - Prompt Engineering (optional) | [`code/02-prompt-engineering.R`](https://github.com/thisisnic/ellmer-latinr/blob/main/code/02-prompt-engineering.R) |
 | 3 - Extracting Structured Data | [`code/03-structured-data.R`](https://github.com/thisisnic/ellmer-latinr/blob/main/code/03-structured-data.R) |
 | 4 - Tool Calling | [`code/04-tool-calling.R`](https://github.com/thisisnic/ellmer-latinr/blob/main/code/04-tool-calling.R) |
 
@@ -41,17 +41,16 @@ Script: [`code/01-getting-started.R`](https://github.com/thisisnic/ellmer-latinr
 
 1.  Set up your API key using `usethis::edit_r_environ()` + restart R
 2.  Start a conversation: `chat_openrouter(model = "openai/gpt-6.1-terra")`
-3.  Ask what the most popular LGBT movie was in 1995 and then 2026
+3.  Ask what the most popular dog breed was in 1995 and then in 2026
 
-## 2 - Prompt Engineering
+## 2 - Prompt Engineering (optional)
 
 Script: [`code/02-prompt-engineering.R`](https://github.com/thisisnic/ellmer-latinr/blob/main/code/02-prompt-engineering.R)
 
 ### Your turn
 
-1. Pick a different movie from the movie dataset and run the "best" version of the prompt on it
-2. Update the prompt to also extract information about the movie's themes
-3. See if you can update it to show what **you** would want to see in a summary
+1. Pick a different dog from the dataset and run the prompt on it
+2. Add one more field to the output format that **you** would want to know before adopting a dog
 
 ## 3 - Extracting Structured Data
 
@@ -59,10 +58,10 @@ Script: [`code/03-structured-data.R`](https://github.com/thisisnic/ellmer-latinr
 
 ### Your turn
 
-1. Pick a different movie from the dataset
-2. Extract the year and genre using `chat_structured()`
-3. Process all movies using `parallel_chat_structured()`
-4. **Bonus:** Add a new field for the movie's tone using `type_enum()` with choices like "Uplifting", "Dark", "Comedic", "Bittersweet"
+1. Pick a different dog from the dataset
+2. Extract the name and age group using `chat_structured()`
+3. Process all dogs using `parallel_chat_structured()`
+4. **Bonus:** Add a new field for the dog's energy level using `type_enum()` with choices like "Low", "Medium", "High"
 
 ## 4 - Tool Calling
 
@@ -70,7 +69,9 @@ Script: [`code/04-tool-calling.R`](https://github.com/thisisnic/ellmer-latinr/bl
 
 ### Your turn
 
-1. Try using the tool and ask different questions and see if you can get the LLM to call it repeatedly
+1. Ask the assistant to save a different shortlist, and approve it this time
+2. Change the rule in `on_tool_request()` so saving is only ever allowed to files ending in `.txt`, without asking
+3. **Bonus:** add a second destructive tool (e.g. one that deletes a file) and check the same approval hook protects it
 
 ## Wrapping up
 
