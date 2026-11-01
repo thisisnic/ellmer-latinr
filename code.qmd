@@ -1,0 +1,79 @@
+---
+title: Code
+subtitle: LatinR 2026 Conference Workshop
+---
+
+# Setup
+
+If you are not working in Posit Cloud, or you do not have the `data/` and `code/` directories showing up in Posit Cloud, you can download them by running:
+
+```r
+# Download workshop materials (code + data)
+download.file(
+  url = "https://github.com/thisisnic/ellmer-latinr/archive/refs/heads/main.zip",
+  destfile = "workshop-materials.zip"
+)
+
+# Unzip and move contents to root
+unzip("workshop-materials.zip")
+file.copy(
+  list.files("ellmer-latinr-main", full.names = TRUE),
+  ".", recursive = TRUE)
+unlink("ellmer-latinr-main", recursive = TRUE)
+```
+
+# Code
+
+There is one R script per section of the workshop in the `code/` directory. Each script ends with the "Your turn" exercises for that section.
+
+| Section | Script |
+|---|---|
+| 1 - Getting Started with LLMs in R | [`code/01-getting-started.R`](https://github.com/thisisnic/ellmer-latinr/blob/main/code/01-getting-started.R) |
+| 2 - Prompt Engineering | [`code/02-prompt-engineering.R`](https://github.com/thisisnic/ellmer-latinr/blob/main/code/02-prompt-engineering.R) |
+| 3 - Extracting Structured Data | [`code/03-structured-data.R`](https://github.com/thisisnic/ellmer-latinr/blob/main/code/03-structured-data.R) |
+| 4 - Tool Calling | [`code/04-tool-calling.R`](https://github.com/thisisnic/ellmer-latinr/blob/main/code/04-tool-calling.R) |
+
+## 1 - Getting Started with LLMs in R
+
+Script: [`code/01-getting-started.R`](https://github.com/thisisnic/ellmer-latinr/blob/main/code/01-getting-started.R)
+
+### Your turn
+
+1.  Set up your API key using `usethis::edit_r_environ()` + restart R
+2.  Start a conversation: `chat_openrouter(model = "openai/gpt-6.1-terra")`
+3.  Ask what the most popular LGBT movie was in 1995 and then 2026
+
+## 2 - Prompt Engineering
+
+Script: [`code/02-prompt-engineering.R`](https://github.com/thisisnic/ellmer-latinr/blob/main/code/02-prompt-engineering.R)
+
+### Your turn
+
+1. Pick a different movie from the movie dataset and run the "best" version of the prompt on it
+2. Update the prompt to also extract information about the movie's themes
+3. See if you can update it to show what **you** would want to see in a summary
+
+## 3 - Extracting Structured Data
+
+Script: [`code/03-structured-data.R`](https://github.com/thisisnic/ellmer-latinr/blob/main/code/03-structured-data.R)
+
+### Your turn
+
+1. Pick a different movie from the dataset
+2. Extract the year and genre using `chat_structured()`
+3. Process all movies using `parallel_chat_structured()`
+4. **Bonus:** Add a new field for the movie's tone using `type_enum()` with choices like "Uplifting", "Dark", "Comedic", "Bittersweet"
+
+## 4 - Tool Calling
+
+Script: [`code/04-tool-calling.R`](https://github.com/thisisnic/ellmer-latinr/blob/main/code/04-tool-calling.R)
+
+### Your turn
+
+1. Try using the tool and ask different questions and see if you can get the LLM to call it repeatedly
+
+## Wrapping up
+
+Thanks so much for coming along!  Please fill in the workshop feedback: <https://forms.gle/LG3VH2o5qcNBp6aLA>
+
+If you want to learn more about using LLMs in R, I've started a newsletter: <https://aifordatapeople.beehiiv.com/>
