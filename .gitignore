@@ -11,3 +11,7 @@ _freeze/*
 _site/*
 
 **/*.quarto_ipynb
+
+# local symlinks to previous workshops/courses
+past-courses/
+materials/shots/

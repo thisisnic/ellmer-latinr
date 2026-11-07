@@ -62,7 +62,7 @@ Have fun and experiment!
 
 ❓ Please ask questions
 <br/><br/>
-🙋 Yanina is here to help with the exercises
+🙋 Yani is here to help with the exercises
 <br/><br/>
 🐢 Tell me to slow down if needed!
 
@@ -125,22 +125,32 @@ OPENROUTER_API_KEY=sk12345567890
 
 <https://ellmer.tidyverse.org/>
 
-## Provider:model
+## Providers and models
 
--   Google: Gemini
--   Anthropic: Claude
--   OpenAI: GPT
+| Provider | Models | ellmer function |
+|---|---|---|
+| OpenAI | GPT | `chat_openai()` |
+| Anthropic | Claude | `chat_anthropic()` |
+| Google | Gemini | `chat_google_gemini()` |
+
+...and many more
 
 ## This workshop
 
-- OpenRouter - allows access to multiple models
+- OpenRouter - one API key, access to models from many providers
+- Models are named `provider/model`, e.g. `"openai/gpt-6.1-terra"`
+
+```{r}
+chat_openrouter(model = "openai/gpt-6.1-terra")
+```
 
 ## {ellmer}: Conversations and Turns
 
+-   two participants: you are the **user**, the model is the **assistant**
 -   participants speak one at a time
--   you have a turn, the model has a turn
+-   the user has a turn, then the assistant has a turn
 
-:::: {.chat theme="slack" names="Model,You" avatars="img/robot.svg,img/person.svg" self="2"}
+:::: {.chat theme="slack" names="assistant,user" avatars="img/robot.svg,img/person.svg" self="2"}
 ::: {.speaker-2 .fragment}
 What is the most popular dog breed in the world?
 :::
@@ -254,6 +264,17 @@ I don't see any earlier messages in this conversation. What topic
 did you have in mind?
 ```
 
+## Chatting interactively
+
+Typing `chat$chat()` every time gets old. Two shortcuts:
+
+```{r}
+live_console(chat)   # chat in the R console, type Q to quit
+live_browser(chat)   # chat in a browser window
+```
+
+Both carry on the same conversation - `chat` still has all the turns afterwards.
+
 ## Your turn
 
 1. Set up your API key using `usethis::edit_r_environ()` + restart R
@@ -306,7 +327,7 @@ If interested in Boris please fill out or adoption application so
 we can set up a meet and greet for you! ...
 ```
 
-## The LLM is very chatty!
+## Without guidance, the model decides what matters
 
 ```{r}
 chat <- chat_openrouter(model = "openai/gpt-6.1-terra")
@@ -962,18 +983,23 @@ readLines("shortlist.txt")
 
 ## When to confirm
 
+:::: {.columns}
+::: {.column width="50%"}
 **Confirm for:**
 
 - System modification
 - Expensive operations
 - API calls
 - Permanent effects
-
+:::
+::: {.column width="50%"}
 **Skip confirmation for:**
 
 - Reading data from memory
 - Simple calculations
-- Operations with no side effects
+- No side effects
+:::
+::::
 
 ## Should the model be allowed to do that?
 
@@ -1079,3 +1105,23 @@ countdown::countdown(minutes = 15)
 ```
 
 # Wrap-up
+
+## What we covered
+
+1. Getting started with LLMs in R
+2. Prompt engineering for more predictable results
+3. Extracting structured data from unstructured text
+4. Using LLMs to call R functions via *tools*
+
+## Where to go next
+
+- ellmer docs: <https://ellmer.tidyverse.org/>
+- Prompt design: <https://ellmer.tidyverse.org/articles/prompt-design.html>
+- Structured data: <https://ellmer.tidyverse.org/articles/structured-data.html>
+- Tool calling: <https://ellmer.tidyverse.org/articles/tool-calling.html>
+- Evaluating LLM output: [{vitals}](https://vitals.tidyverse.org/)
+- Chat UIs in Shiny: [{shinychat}](https://posit-dev.github.io/shinychat/)
+
+## Wrapping Up 🎉
+<br/><br/>
+🙌 Thanks for coming!
