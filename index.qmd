@@ -6,6 +6,8 @@ editor: source
 
 by Nic Crane
 
+![](img/hex-ellmer.png){fig-align="left" width="180px"}
+
 **Wednesday 11th November 2026, 08:30-12:00 COT (UTC-5), Sala 1**
 
 [LatinR 2026](https://latinr.org/en/), Universidad de Antioquia, Medellín, Colombia
