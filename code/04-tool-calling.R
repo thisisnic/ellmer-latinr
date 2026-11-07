@@ -29,19 +29,6 @@ chat$chat("Which dog breeds are most popular this year?")
 # ellmer to run, so the turn just contains the answer
 chat$last_turn()
 
-## Where did that come from? Citations
-
-# OpenRouter returns the sources it used alongside the text. ellmer keeps the
-# raw API response in the turn's @json slot, so we can dig them out
-annotations <- chat$last_turn()@json$choices[[1]]$message$annotations
-length(annotations)
-str(annotations[[1]])
-
-citations <- bind_rows(lapply(annotations, function(a) {
-  tibble(title = a$url_citation$title, url = a$url_citation$url)
-}))
-citations
-
 ## Client-side: your own R functions as tools
 
 # Define the function

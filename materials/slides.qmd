@@ -717,6 +717,355 @@ By the end of this section you'll be able to:
 - Decide when to send data directly versus provide a tool to fetch it
 - Review and block tool calls before they run with `on_tool_request()`
 
+## Tools
+
+- LLMs can only generate text - they can't *do* things
+- Tools let the LLM request to call R functions
+- The LLM decides when to use them based on the conversation
+
+## What can tools do?
+
+- Retrieve new information
+- Read/write files
+- Perform calculations accurately
+- ...anything you can do with an R function!
+
+## Two kinds of tool
+
+**Server-side** - run on the provider's infrastructure
+
+- The model calls them without R being involved
+- Web search is the most common example
+
+**Client-side** - R functions on our machine
+
+- The model asks for them, ellmer runs them, sends the result back
+
+## Server-side: web search
+
+Without search, the model only knows what it learned in training...
+
+```{r}
+chat <- chat_openrouter(model = "openai/gpt-6.1-terra")
+chat$chat("Which dog breeds are most popular this year?")
+```
+
+```
+I can't verify this year's rankings, but the American Kennel Club's
+**2024 U.S. registration rankings** placed these breeds in the top
+five:
+
+1. French bulldog
+2. Labrador retriever
+...
+```
+
+## Server-side: web search with `:online` {.smaller}
+
+```{r}
+chat <- chat_openrouter(model = "openai/gpt-6.1-terra:online")
+chat$chat("Which dog breeds are most popular this year?")
+```
+
+```
+In the United States, the **French Bulldog** tops the latest American
+Kennel Club ranking, released in 2026 and based on 2025
+registrations:
+([akc.org](https://www.akc.org/press-releases/je-taime-once-again-...))
+
+1. French Bulldog
+2. Labrador Retriever
+3. Golden Retriever
+4. German Shepherd Dog
+5. Dachshund
+...
+```
+
+OpenRouter ran a web search before the model answered. No tool call for ellmer to run - the turn just contains the answer.
+
+## How client-side tools work
+
+1. Send message
+2. LLM decides if tool needed
+3. LLM requests tool call
+4. Your R session executes the function
+5. Result sent back to LLM
+6. LLM uses result and responds
+
+## Using tools
+
+1. Define R function
+2. Turn it into a tool
+3. Register tool with a chat object
+
+## Without a tool the model has to guess...
+
+```{r}
+chat <- chat_openrouter(model = "openai/gpt-6.1-terra")
+chat$chat("what date is it right now?")
+```
+
+```
+Today is March 2, 2026.
+```
+
+## What's the time?
+
+```{r}
+# Define the function
+get_time <- function() {
+  format(Sys.time(), "%A %d %B %Y, %H:%M")
+}
+
+# Create tool
+time_tool <- tool(get_time, "Get the current date and time")
+
+# Register the tool with the chat
+chat$register_tool(time_tool)
+chat$chat("what date is it right now?")
+```
+
+```
+◯ [tool call] get_time()
+● #> Saturday 07 November 2026, 15:00
+Today is November 7, 2026.
+```
+
+## The tool call is part of the conversation {.smaller}
+
+```{r}
+chat
+```
+
+```
+<Chat OpenRouter/openai/gpt-6.1-terra turns=6 input=192 output=90>
+── user ────────────────────────────────────────────────────
+what date is it right now?
+── assistant [input=13 output=49] ──────────────────────────
+Today is March 2, 2026.
+── user ────────────────────────────────────────────────────
+what date is it right now?
+── assistant [input=71 output=27] ──────────────────────────
+[tool request (call_Jkx5jaGcUjIX8YXxkyo4oPgC)]: get_time()
+── user ────────────────────────────────────────────────────
+[tool result  (call_Jkx5jaGcUjIX8YXxkyo4oPgC)]: Saturday 07 November 2026, 15:00
+── assistant [input=108 output=14] ─────────────────────────
+Today is November 7, 2026.
+```
+
+## Giving the model our dog database
+
+We don't always need a tool - sometimes we can just send the data
+
+```{r}
+prompt <- "You are a dog adoption assistant helping the user choose a dog
+from the listings they give you."
+
+chat <- chat_openrouter(
+  model = "openai/gpt-6.1-terra",
+  system_prompt = prompt
+)
+
+chat$chat(
+  "Here are the dogs available:",
+  content_document_file("data/dogs_details.csv")
+)
+```
+
+```
+I've got the listings! What are you looking for in a dog? It would
+help to know:
+
+- Your location and how far you're willing to travel
+- Whether you have children or other pets
+...
+```
+
+## Ask for a recommendation {.smaller}
+
+```{r}
+chat$chat("I live in a small flat and already have a dog. Which three would suit me?")
+```
+
+```
+Based on their size and reported friendliness with other dogs, these
+three look like promising matches:
+
+1. **Trixie** — A 10–12 lb Chihuahua mix described as quiet, calm,
+housebroken and great with other dogs. She looks like the strongest
+fit for a small flat.
+2. **Gypsy Girl** — A 15 lb Chihuahua mix who is gentle and good with
+other dogs. She can be shy at first but reportedly warms up quickly.
+3. **Pippin** — About 10 lb and described as loving people and good
+with other dogs. Her energy level and house-training aren't
+specified, so those are worth asking about.
+...
+```
+
+## A tool that changes things {.smaller}
+
+Save a shortlist to a file - this time the tool takes arguments the model has to supply
+
+```{r}
+# Define the function - note it returns a string describing what it did
+save_shortlist <- function(names, path) {
+  writeLines(names, path)
+  paste("Saved", length(names), "dogs to", path)
+}
+
+# Create tool
+save_shortlist_tool <- tool(
+  save_shortlist,
+  "Save a shortlist of dog names to a text file",
+  arguments = list(
+    names = type_array(type_string("Dog names")),
+    path = type_string("File path to save to")
+  )
+)
+```
+
+## Save the shortlist
+
+```{r}
+chat$register_tool(save_shortlist_tool)
+chat$chat("Save those three to shortlist.txt")
+```
+
+```
+◯ [tool call] save_shortlist(names = c("Trixie", "Gypsy Girl",
+"Pippin"), path = "shortlist.txt")
+● #> Saved 3 dogs to shortlist.txt
+Saved Trixie, Gypsy Girl, and Pippin to `shortlist.txt`.
+```
+
+```{r}
+readLines("shortlist.txt")
+```
+
+```
+[1] "Trixie"     "Gypsy Girl" "Pippin"
+```
+
+## A word of caution
+
+- The LLM decides when to call tools - you're giving it control
+- Be careful with tools that write, delete, or send data
+- Consider what happens if the LLM calls a tool unexpectedly
+
+## Risky tool capabilities
+
+- Run computationally expensive operations
+- Write files
+- Delete files
+- Send data to external services
+- Modify databases
+
+## When to confirm
+
+**Confirm for:**
+
+- System modification
+- Expensive operations
+- API calls
+- Permanent effects
+
+**Skip confirmation for:**
+
+- Reading data from memory
+- Simple calculations
+- Operations with no side effects
+
+## Should the model be allowed to do that?
+
+Checking the time just *reads* something. Saving a file *changes* something.
+
+Annotations let us describe what each tool does:
+
+```{r}
+time_tool <- tool(
+  get_time,
+  "Get the current date and time",
+  annotations = tool_annotations(read_only_hint = TRUE)
+)
+
+save_shortlist_tool <- tool(
+  save_shortlist,
+  "Save a shortlist of dog names to a text file",
+  arguments = list(
+    names = type_array(type_string("Dog names")),
+    path = type_string("File path to save to")
+  ),
+  annotations = tool_annotations(read_only_hint = FALSE)
+)
+```
+
+## Asking the user first {.smaller}
+
+`on_tool_request()` runs before every tool call. Return nothing to allow it, or call `tool_reject()` to block it.
+
+```{r}
+chat <- chat_openrouter(model = "openai/gpt-6.1-terra", system_prompt = prompt)
+chat$register_tool(time_tool)
+chat$register_tool(save_shortlist_tool)
+
+chat$on_tool_request(function(request) {
+  # Read-only tools go straight through
+  if (isTRUE(request@tool@annotations$read_only_hint)) {
+    return()
+  }
+
+  cat("The model wants to run", request@name, "with arguments:\n")
+  str(request@arguments)
+
+  answer <- readline("Allow? (y/n) ")
+  if (tolower(answer) != "y") {
+    tool_reject("The user did not approve this action")
+  }
+})
+```
+
+## Saying no {.smaller}
+
+```{r}
+chat$chat("Pick two adult dogs and save them to adults.txt")
+```
+
+```
+◯ [tool call] save_shortlist(names = c("Gypsy Girl", "Lamb Chop"),
+path = "adults.txt")
+The model wants to run save_shortlist with arguments:
+List of 2
+ $ names:List of 2
+  ..$ : chr "Gypsy Girl"
+  ..$ : chr "Lamb Chop"
+ $ path : chr "adults.txt"
+Allow? (y/n) n
+■ #> Error: Tool call rejected. The user did not approve this action
+I picked **Gypsy Girl** and **Lamb Chop**, both adult dogs. I
+couldn't save them to `adults.txt` because the save action wasn't
+approved.
+```
+
+The model is told why, and carries on gracefully.
+
+## Read-only tools don't trigger the question
+
+```{r}
+chat$chat("what time is it?")
+```
+
+```
+◯ [tool call] get_time()
+● #> Saturday 07 November 2026, 15:00
+It's 3:00 PM on Saturday, November 7, 2026.
+```
+
+## Try it live
+
+```{r}
+live_console(chat)
+```
+
 ## Your turn
 
 1. Ask the assistant to save a different shortlist, and approve it this time
