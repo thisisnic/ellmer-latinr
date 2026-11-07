@@ -1022,12 +1022,18 @@ Checking the time just *reads* something. Saving a file *changes* something.
 Annotations let us describe what each tool does:
 
 ```{r}
+#| code-line-numbers: "4"
 time_tool <- tool(
   get_time,
   "Get the current date and time",
   annotations = tool_annotations(read_only_hint = TRUE)
 )
+```
 
+## Should the model be allowed to do that?
+
+```{r}
+#| code-line-numbers: "8"
 save_shortlist_tool <- tool(
   save_shortlist,
   "Save a shortlist of dog names to a text file",
