@@ -1,0 +1,175 @@
+---
+title: Using LLMs in R with ellmer
+subtitle: "LatinR 2026"
+author: "Nic Crane"
+date: 2026-11-11
+format:
+  revealjs:
+    theme: [default, ../styles.scss]
+    slide-number: true
+    embed-resources: true
+execute:
+  eval: false
+  echo: true
+---
+
+# 0 - Welcome
+
+## Hi! 👋
+
+:::: {layout-ncol="2" style="text-align: center;"}
+<div>
+
+![](img/people/nic-crane.jpg){width="300px" height="300px" style="border-radius: 50%; object-fit: cover;"}
+
+**Nic Crane**<br>Instructor
+
+</div>
+
+<div>
+
+![](img/people/yanina-bellini-saibene.jpg){width="300px" height="300px" style="border-radius: 50%; object-fit: cover;"}
+
+**Yanina Bellini Saibene**<br>TA
+
+</div>
+::::
+
+## What we'll learn
+
+1. **Welcome and setup** - we're here!
+2. Getting started with LLMs in R
+3. Prompt engineering for more predictable results
+
+**BREAK**
+
+4. Extracting structured data from unstructured text
+5. Using LLMs to call R functions via *tools*
+
+## Format
+
+📖 Explanations
+<br/><br/>
+🎥 Demos
+<br/><br/>
+✏️ Exercises
+<br/><br/>
+Have fun and experiment!
+
+## Housekeeping
+
+❓ Please ask questions
+<br/><br/>
+🙋 Yanina is here to help with the exercises
+<br/><br/>
+🐢 Tell me to slow down if needed!
+
+## Working on Posit Cloud
+
+- <https://posit.cloud/>
+- Or your own laptop, if you've done the prework
+
+## Code/examples
+
+- <https://thisisnic.github.io/ellmer-latinr/>
+- One script per section in `code/`
+
+## How do we work with LLMs? APIs!
+
+- Need an API key
+- You should have received one today
+- If you haven't, let us know!
+
+# 1 - Getting Started with LLMs in R
+
+## Learning objectives
+
+By the end of this section you'll be able to:
+
+- Set up an API key and connect to an LLM from R
+- Send messages and read the replies
+- Hold a multi-turn conversation, and understand why earlier messages affect later answers
+- Start a fresh chat when you need to
+
+## Your turn
+
+1. Set up your API key using `usethis::edit_r_environ()` + restart R
+2. Start a conversation: `chat_openrouter(model = "openai/gpt-6.1-terra")`
+3. Paste one dog's description from `dogs.csv` and ask: *would this dog suit a flat with no garden?*
+4. Ask a follow-up question without repeating the description
+
+```{r}
+#| echo: false
+#| eval: true
+countdown::countdown(minutes = 10)
+```
+
+# 2 - Prompt Engineering
+
+## Learning objectives
+
+By the end of this section you'll be able to:
+
+- Use a system prompt to set how the model behaves across a conversation
+- Write prompts with a clear role, task and output format
+- Understand why the same prompt still gives varying answers
+
+## Your turn
+
+1. Pick a different dog from the dataset and run the prompt on it
+2. Add one more field to the output format that **you** would want to know before adopting a dog
+
+```{r}
+#| echo: false
+#| eval: true
+countdown::countdown(minutes = 8)
+```
+
+# 3 - Extracting Structured Data
+
+## Learning objectives
+
+By the end of this section you'll be able to:
+
+- Get structured data back from the model instead of free text
+- Extract text, numbers, yes/no values, categories and lists using `chat_structured()`
+- Run the same extraction across a whole dataset
+- Combine the results into a data frame and save it
+
+## Your turn
+
+1. Pick a different dog from the dataset
+2. Extract the name and age group using `chat_structured()`
+3. Process all dogs using `parallel_chat_structured()`
+4. **Bonus:** add an energy level field using `type_enum()` with choices like "Low", "Medium", "High"
+
+```{r}
+#| echo: false
+#| eval: true
+countdown::countdown(minutes = 15)
+```
+
+# 4 - Tool Calling
+
+## Learning objectives
+
+By the end of this section you'll be able to:
+
+- Understand the difference between tools the provider runs and tools you run
+- Give the model your own R functions as tools
+- Decide when to send data directly versus provide a tool to fetch it
+- Review and block tool calls before they run with `on_tool_request()`
+
+## Your turn
+
+1. Ask the assistant to save a different shortlist, and approve it this time
+2. Change the rule in `on_tool_request()` so saving is only ever allowed to files ending in `.txt`, without asking
+3. **Bonus:** log every tool call (name and arguments) to a data frame using `on_tool_request()`
+
+```{r}
+#| echo: false
+#| eval: true
+countdown::countdown(minutes = 15)
+```
+
+# Wrap-up

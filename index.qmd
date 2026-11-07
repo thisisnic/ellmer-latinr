@@ -51,7 +51,6 @@ You'll need an API key from an LLM provider. We'll be using [OpenRouter](https:/
 - Section 1: Getting Started with LLMs in R
 - Section 2: Prompt Engineering (brief)
 - Section 3: Structured Output
-- Break
 - Section 4: Tool Calling
 - Wrap-up and Resources
 
@@ -61,7 +60,7 @@ You'll need an API key from an LLM provider. We'll be using [OpenRouter](https:/
 
 ### Code
 
-All the code from the workshop can be found on the [Code and Exercises](code.qmd) page.
+All the code is in the [`code/`](https://github.com/thisisnic/ellmer-latinr/tree/main/code) directory of the GitHub repo, one script per section, with exercises at the end of each.
 
 
 ------------------------------------------------------------------------

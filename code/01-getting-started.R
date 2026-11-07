@@ -41,4 +41,6 @@ chat$chat("Are you sure about that?")
 
 # 1. Set up your API key using usethis::edit_r_environ() + restart R
 # 2. Start a conversation: chat_openrouter(model = "openai/gpt-6.1-terra")
-# 3. Ask what the most popular dog breed was in 1995 and then in 2026
+# 3. Paste one dog's description from dogs.csv and ask: would this dog suit
+#    a flat with no garden?
+# 4. Ask a follow-up question without repeating the description
