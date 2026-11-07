@@ -4,6 +4,8 @@ project:
   render:
     - "*.qmd"
     - "!materials/"
+  resources:
+    - materials/slides.html
   execute-dir: project
 
 website:
@@ -20,6 +22,8 @@ website:
     left:
       - href: index.qmd
         text: Home
+      - text: Slides
+        href: materials/slides.html
 
 format:
   html:

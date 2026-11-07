@@ -125,6 +125,20 @@ OPENROUTER_API_KEY=sk12345567890
 
 <https://ellmer.tidyverse.org/>
 
+## ellmer: the foundation of the R AI ecosystem
+
+ellmer handles talking to the models. A growing set of packages build on it:
+
+- **{shinychat}** - chat interfaces in Shiny
+- **{querychat}** - ask questions of your data in plain English
+- **{mall}** - run LLM prompts over data frame columns
+- **{ragnar}** - retrieval-augmented generation
+- **{vitals}** - evaluate LLM output
+- **{btw}** - describe your R session to an LLM
+- **{mcptools}** - connect R to MCP tools and agents
+
+Learn ellmer and the rest of the ecosystem opens up.
+
 ## Providers and models
 
 | Provider | Models | ellmer function |

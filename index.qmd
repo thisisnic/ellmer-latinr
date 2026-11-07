@@ -54,13 +54,16 @@ You'll need an API key from an LLM provider. We'll be using [OpenRouter](https:/
 - Section 4: Tool Calling
 - Wrap-up and Resources
 
-### Instructor
+### Instructor and TA
 
-[**Nic Crane**](https://niccrane.com) is an R consultant with a background in data science and software engineering. They are passionate about open source, and learning and teaching all things R.
+[**Nic Crane**](https://niccrane.com) (instructor) is an R consultant with a background in data science and software engineering. They maintain the Apache Arrow R package and help maintain ellmer, and are passionate about open source, and learning and teaching all things R.
 
-### Code
+[**Yanina Bellini Saibene**](https://yabellini.netlify.app/) (TA) is Community Manager at rOpenSci, a 2026 Sovereign Tech Fellow, part of the RLadies+ Global leadership team, a board member of The Carpentries, and a co-founder of LatinR and MetaDocencia. Yani will be helping out with the exercises.
 
-All the code is in the [`code/`](https://github.com/thisisnic/ellmer-latinr/tree/main/code) directory of the GitHub repo, one script per section, with exercises at the end of each.
+### Slides and code
+
+- [Slides](materials/slides.html)
+- All the code is in the [`code/`](https://github.com/thisisnic/ellmer-latinr/tree/main/code) directory of the GitHub repo, one script per section, with exercises at the end of each.
 
 
 ------------------------------------------------------------------------
