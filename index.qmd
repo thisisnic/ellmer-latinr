@@ -60,7 +60,7 @@ You'll need an API key from an LLM provider. We'll be using [OpenRouter](https:/
 
 [**Nic Crane**](https://niccrane.com) (instructor) is an R consultant with a background in data science and software engineering. They maintain the Apache Arrow R package and help maintain ellmer, and are passionate about open source, and learning and teaching all things R.
 
-[**Yanina Bellini Saibene**](https://yabellini.netlify.app/) (TA) is Community Manager at rOpenSci, a 2026 Sovereign Tech Fellow, part of the RLadies+ Global leadership team, a board member of The Carpentries, and a co-founder of LatinR and MetaDocencia. Yani will be helping out with the exercises.
+[**Yanina Bellini Saibene**](https://yabellini.netlify.app/) (TA) is Community Manager at rOpenSci, a 2026 Sovereign Tech Fellow, part of the RLadies+ Global leadership team, a board member of The Carpentries, and a co-founder of LatinR. Yani will be helping out with the exercises.
 
 ### Slides and code
 
