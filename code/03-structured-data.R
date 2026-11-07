@@ -34,7 +34,7 @@ chat$chat_structured(dog_description, type = name_type)
 
 ## Extracting a number
 
-fee_type <- type_number("Adoption fee in dollars", required = FALSE)
+fee_type <- type_number("Adoption fee in dollars")
 
 chat <- chat_openrouter(model = "openai/gpt-6.1-terra")
 chat$chat_structured(dog_description, type = fee_type)
@@ -43,7 +43,7 @@ chat$chat_structured(dog_description, type = fee_type)
 
 age_groups <- c("Baby", "Young", "Adult", "Senior")
 
-age_type <- type_enum(age_groups, "Age group of the dog", required = FALSE)
+age_type <- type_enum(age_groups, "Age group of the dog")
 
 chat <- chat_openrouter(model = "openai/gpt-6.1-terra")
 chat$chat_structured(dog_description, type = age_type)
@@ -51,8 +51,7 @@ chat$chat_structured(dog_description, type = age_type)
 ## Extracting a yes/no
 
 other_dogs_type <- type_boolean(
-  "Is the dog recommended for a home with other dogs?",
-  required = FALSE
+  "Is the dog recommended for a home with other dogs?"
 )
 
 chat <- chat_openrouter(model = "openai/gpt-6.1-terra")
@@ -68,14 +67,13 @@ chat$chat_structured(dog_description, type = likes_type)
 ## Combining multiple fields
 
 dog_spec <- type_object(
-  name = type_string("The name of the dog", required = FALSE),
-  breed = type_string("Breed of the dog", required = FALSE),
-  adoption_fee = type_number("Adoption fee in dollars", required = FALSE),
+  name = type_string("The name of the dog"),
+  breed = type_string("Breed of the dog"),
+  adoption_fee = type_number("Adoption fee in dollars"),
   other_dogs = type_boolean(
     "Is the dog recommended for a home with other dogs?",
-    required = FALSE
   ),
-  age = type_enum(age_groups, "Age group of the dog", required = FALSE)
+  age = type_enum(age_groups, "Age group of the dog")
 )
 
 chat <- chat_openrouter(model = "openai/gpt-6.1-terra")

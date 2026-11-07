@@ -8,6 +8,8 @@ format:
     theme: [default, ../styles.scss]
     slide-number: true
     embed-resources: true
+revealjs-plugins:
+  - chat-bubbles
 execute:
   eval: false
   echo: true
@@ -91,6 +93,167 @@ By the end of this section you'll be able to:
 - Hold a multi-turn conversation, and understand why earlier messages affect later answers
 - Start a fresh chat when you need to
 
+## Setting up your API key
+
+-   Grab the API key you were sent!
+-   Next we'll save it in `.Renviron` so we can use it
+
+## Editing your .Renviron
+
+Open your `.Renviron` file
+
+```{r}
+usethis::edit_r_environ()
+```
+
+## Editing your .Renviron
+
+Save your API key at the bottom of the file like this:
+<br/><br/>
+```         
+OPENROUTER_API_KEY=sk12345567890
+```
+<br/>
+*Important: After saving, restart R for the key to take effect.*
+
+## The ellmer R package
+
+![](img/hex-ellmer.png){fig-align="center" height="400px"}
+
+- work with LLMs in R
+- handles all API calling for you
+
+<https://ellmer.tidyverse.org/>
+
+## Provider:model
+
+-   Google: Gemini
+-   Anthropic: Claude
+-   OpenAI: GPT
+
+## This workshop
+
+- OpenRouter - allows access to multiple models
+
+## {ellmer}: Conversations and Turns
+
+-   participants speak one at a time
+-   you have a turn, the model has a turn
+
+:::: {.chat theme="slack" names="Model,You" avatars="img/robot.svg,img/person.svg" self="2"}
+::: {.speaker-2 .fragment}
+What is the most popular dog breed in the world?
+:::
+::: {.speaker-1 .fragment}
+The Labrador Retriever.
+:::
+::: {.speaker-2 .fragment}
+What are they like to live with?
+:::
+::: {.speaker-1 .fragment}
+Friendly, energetic, and food-motivated!
+:::
+::::
+
+## Context
+
+- LLMs can't "remember" past conversation
+- every time you send a new message, entire conversation history sent with it
+- context - grows every turn
+- context window: how much you can send, measured in tokens
+
+## Tokens
+
+-   Context window measured in tokens
+-   What is sent back and forth, and used to measure cost
+-   in English, 1 token is around 0.75 words
+
+## Starting a conversation
+
+```{r}
+library(ellmer)
+chat <- chat_openrouter(model = "openai/gpt-6.1-terra")
+```
+
+## Sending a message to the LLM
+
+```{r}
+chat$chat("What is the most popular dog breed in the world?
+  Answer succinctly.")
+```
+
+```
+The **Labrador Retriever** is widely considered the world's most
+popular dog breed, though there's no definitive global count.
+```
+
+## Turns
+
+```{r}
+chat
+```
+
+```
+<Chat OpenRouter/openai/gpt-6.1-terra turns=2 input=22 output=92>
+── user ────────────────────────────────────────────────────
+What is the most popular dog breed in the world?
+  Answer succinctly.
+── assistant [input=22 output=92] ──────────────────────────
+<thinking> ... </thinking>
+
+The **Labrador Retriever** is widely considered the world's most
+popular dog breed, though there's no definitive global count.
+```
+
+## Continuing the conversation
+
+```{r}
+chat$chat("What are they like to live with?")
+chat$chat("How long do they usually live?")
+chat
+```
+
+```
+<Chat OpenRouter/openai/gpt-6.1-terra turns=6 input=236 output=183>
+── user ────────────────────────────────────────────────────
+What is the most popular dog breed in the world? ...
+── assistant [input=22 output=92] ──────────────────────────
+The **Labrador Retriever** is widely considered ...
+── user ────────────────────────────────────────────────────
+What are they like to live with?
+── assistant [input=66 output=69] ──────────────────────────
+Labradors are generally friendly, affectionate, and eager to ...
+── user ────────────────────────────────────────────────────
+How long do they usually live?
+── assistant [input=148 output=22] ─────────────────────────
+Labrador Retrievers usually live **10–12 years**, though some
+live longer.
+```
+
+## Cumulative nature of tokens
+
+| Turn | What's sent to the API                                        |
+|------|---------------------------------------------------------------|
+| 1    | Your question                                                 |
+| 2    | Your question + response + new question                       |
+| 3    | Your question + response + question + response + new question |
+
+Each turn sends the **entire conversation history** - input tokens grow with every message!
+
+Numbers don't match up perfectly - some things are cached
+
+## Reset - just start a new chat
+
+```{r}
+chat <- chat_openrouter(model = "openai/gpt-6.1-terra")
+chat$chat("What were we saying earlier?")
+```
+
+```
+I don't see any earlier messages in this conversation. What topic
+did you have in mind?
+```
+
 ## Your turn
 
 1. Set up your API key using `usethis::edit_r_environ()` + restart R
@@ -114,6 +277,137 @@ By the end of this section you'll be able to:
 - Write prompts with a clear role, task and output format
 - Understand why the same prompt still gives varying answers
 
+## Load the data to work with
+
+```{r}
+library(ellmer)
+library(dplyr)
+
+dogs <- readr::read_csv("data/dogs.csv")
+
+dog_description <- dogs |>
+  slice(1) |>
+  pull(description)
+
+dog_description
+```
+
+```
+Boris is a handsome mini schnauzer who made his long trek up her
+from Arkansas on 4/2019. He loves rope toys and running around his
+foster mom's yard.
+
+He is 4 years old, just under 10 pounds, and is a special needs
+dog. He needs vitamin B-12 shots every other week (may change), and
+needs prescription dog food with no meet or protein. Boris is on a
+vegan diet.
+
+If interested in Boris please fill out or adoption application so
+we can set up a meet and greet for you! ...
+```
+
+## The LLM is very chatty!
+
+```{r}
+chat <- chat_openrouter(model = "openai/gpt-6.1-terra")
+chat$chat("Summarise this dog:", dog_description)
+```
+
+```
+Boris is a 4-year-old mini schnauzer weighing just under 10 pounds.
+He loves rope toys and running around the yard. He has special
+needs, including B-12 shots every other week and a prescription
+vegan diet.
+
+His adoption fee is $300. Apply at
+http://www.aohrescue.org/dog-adoption-application.
+```
+
+## System prompt
+
+- Defines the model's behaviour throughout the conversation
+- Set once, persists afterwards
+
+## Setting the system prompt
+
+```{r}
+prompt <- "You are a dog adoption assistant helping people find dogs to adopt.
+Summarise the dog description you are given to help potential adopters decide
+if the dog is a good fit for them. Respond in 50 words or fewer.
+
+## Output format
+
+Name: the dog's name
+Summary: a 1 sentence description
+Age group: one of Baby, Young, Adult, Senior
+Likes and dislikes: what the dog does and doesn't enjoy"
+
+chat <- chat_openrouter(
+  model = "openai/gpt-6.1-terra",
+  system_prompt = prompt
+)
+chat$chat("Summarise this dog:", dog_description)
+```
+
+## Setting the system prompt - output
+
+```
+Name: Boris
+Summary: Boris is a 4-year-old, under-10-pound mini schnauzer with
+special needs, including a prescription vegan diet and B-12 shots
+every other week.
+Age group: Adult
+Likes and dislikes: Loves rope toys and running around the yard;
+dislikes are not specified.
+```
+
+## Run it again though...responses vary {.smaller}
+
+```{r}
+chat <- chat_openrouter(
+  model = "openai/gpt-6.1-terra",
+  system_prompt = prompt
+)
+chat$chat("Summarise this dog:", dog_description)
+```
+
+```
+Name: Boris
+Summary: Boris is a 4-year-old mini schnauzer under 10 pounds who
+needs prescription vegan food and B-12 shots every other week,
+subject to change.
+Age group: Adult
+Likes and dislikes: Loves rope toys and running around the yard;
+dislikes are not stated.
+```
+
+## Prompt engineering
+
+- LLMs are *non-deterministic* - we get different results each time
+- Prompt engineering == refining a prompt until we get better or more consistent results
+- Improves quality of responses
+- Best approaches specific to individual models
+
+## Prompt engineering
+
+In general, the following principles...
+
+- be specific
+- give context and a role
+- include examples
+- allow the model to be wrong
+- read prompting guides for the model/provider you're working with
+
+**Most importantly...iterate!**
+
+<https://ellmer.tidyverse.org/articles/prompt-design.html>
+
+## But...
+
+The format holds, but it's still free text we'd have to parse.
+
+Next: make the model return **data** instead.
+
 ## Your turn
 
 1. Pick a different dog from the dataset and run the prompt on it
@@ -135,6 +429,269 @@ By the end of this section you'll be able to:
 - Extract text, numbers, yes/no values, categories and lists using `chat_structured()`
 - Run the same extraction across a whole dataset
 - Combine the results into a data frame and save it
+
+## The problem with unstructured output
+
+```{r}
+chat <- chat_openrouter(model = "openai/gpt-6.1-terra")
+output <- chat$chat(
+  "Extract the name and adoption fee from this data
+
+  ## Output format
+
+  Name:
+  Adoption fee:",
+  dog_description
+)
+output
+class(output)
+```
+
+```
+Name: Boris
+Adoption fee: $300
+[1] "ellmer_output"
+```
+
+## The problem with free-form LLM responses
+
+-   **Unpredictable format**: sometimes lists, sometimes paragraphs
+-   **Hard to parse**: can't reliably extract specific values
+-   **Manual parsing**: fragile string manipulation
+
+The format isn't guaranteed - hard to use programmatically!
+
+## Structured output
+
+- Specify the data type using a **type specification**
+- Model returns data matching that structure
+- Numbers are numbers, strings are strings
+- No need to parse text or write regex
+- Data types don't match R's perfectly
+
+## Type functions
+
+| Function | Returns | Use for |
+|----------|---------|---------|
+| `type_string()` | character | text values |
+| `type_integer()` | integer | whole numbers |
+| `type_number()` | numeric | decimal numbers |
+| `type_boolean()` | logical | TRUE/FALSE |
+| `type_enum()` | character | fixed set of choices |
+| `type_array()` | vector | lists of values |
+| `type_object()` | list | multiple different types |
+
+## Extracting a single value
+
+```{r}
+name_type <- type_string("The name of the dog")
+
+chat <- chat_openrouter(model = "openai/gpt-6.1-terra")
+chat$chat_structured(dog_description, type = name_type)
+```
+
+```
+[1] "Boris"
+```
+
+We get a plain string back - no "Name:" prefix to strip off!
+
+## Extracting a number
+
+```{r}
+fee_type <- type_number("Adoption fee in dollars")
+
+chat <- chat_openrouter(model = "openai/gpt-6.1-terra")
+chat$chat_structured(dog_description, type = fee_type)
+```
+
+```
+[1] 300
+```
+
+A number, not text!
+
+## Constraining to specific choices
+
+Remember how we had to spell out the age groups in our prompt?
+
+```{r}
+age_groups <- c("Baby", "Young", "Adult", "Senior")
+
+age_type <- type_enum(age_groups, "Age group of the dog")
+
+chat <- chat_openrouter(model = "openai/gpt-6.1-terra")
+chat$chat_structured(dog_description, type = age_type)
+```
+
+```
+[1] "Adult"
+```
+
+The model *must* choose from our list.
+
+## Extracting a yes/no
+
+```{r}
+other_dogs_type <- type_boolean(
+  "Is the dog recommended for a home with other dogs?"
+)
+
+chat <- chat_openrouter(model = "openai/gpt-6.1-terra")
+chat$chat_structured(dog_description, type = other_dogs_type)
+```
+
+```
+[1] FALSE
+```
+
+## Extracting a list of values
+
+```{r}
+likes_type <- type_array(type_string("Things the dog likes"))
+
+chat <- chat_openrouter(model = "openai/gpt-6.1-terra")
+chat$chat_structured(dog_description, type = likes_type)
+```
+
+```
+[1] "Rope toys"
+[2] "Running around his foster mom's yard"
+```
+
+## Combining multiple fields {.smaller}
+
+Use `type_object()` to extract multiple pieces of information at once:
+
+```{r}
+dog_spec <- type_object(
+  name = type_string("The name of the dog"),
+  breed = type_string("Breed of the dog"),
+  adoption_fee = type_number("Adoption fee in dollars"),
+  other_dogs = type_boolean("Is the dog recommended for a home with other dogs?"),
+  age = type_enum(age_groups, "Age group of the dog")
+)
+
+chat <- chat_openrouter(model = "openai/gpt-6.1-terra")
+chat$chat_structured(dog_description, type = dog_spec)
+```
+
+## Combining multiple fields - output
+
+```
+$name
+[1] "Boris"
+
+$breed
+[1] "Miniature Schnauzer"
+
+$adoption_fee
+[1] 300
+
+$other_dogs
+[1] FALSE
+
+$age
+[1] "Adult"
+```
+
+## Processing multiple items
+
+- Use `parallel_chat_structured()`
+- Different syntax:
+  - chat: a chat object
+  - prompts: a list of prompts
+  - type: a type specification
+- Returns a single data frame
+
+## Processing multiple dogs
+
+```{r}
+prompts <- paste(
+  "Extract data from this dog adoption listing:",
+  dogs$description
+)
+
+output <- parallel_chat_structured(
+  chat = chat_openrouter(model = "openai/gpt-6.1-terra"),
+  prompts = as.list(prompts),
+  type = dog_spec
+)
+
+output
+```
+
+## Processing multiple dogs - output {.smaller}
+
+```
+# A tibble: 20 × 5
+   name         breed                    adoption_fee other_dogs age
+   <chr>        <chr>                           <dbl> <lgl>      <fct>
+ 1 Boris        "Miniature Schnauzer"             300 FALSE      Adult
+ 2 Duke         "Potcake"                           0 FALSE      Young
+ 3 Zac Woof-ron "Red Heeler"                        0 TRUE       Adult
+ 4 boy          "unknown"                           0 TRUE       Adult
+ 5 Palang       "Unknown"                           0 FALSE      Adult
+ 6 Brooke       "Sight-hound mix"                   0 FALSE      Adult
+ 7 Tate         "Cockapoo"                        275 TRUE       Adult
+ 8 Trixie       "Chihuahua mix"                   325 TRUE       Adult
+ 9 Reba         "Dachshund"                       325 TRUE       Adult
+10 Moric        "Labrador Retriever and…          325 TRUE       Young
+# ℹ 10 more rows
+```
+
+## When the data isn't there
+
+- Duke's fee came back as `0`, and several breeds as `"Unknown"`
+- Every field was *required*, so the model had to put something
+- `required = FALSE` lets the model return `NULL` instead of guessing
+
+```{r}
+breed_type <- type_string("Breed of the dog", required = FALSE)
+```
+
+::: notes
+Reduce hallucination with optional fields. Note: at time of writing this errors with gpt-6.1-terra via OpenRouter, works with Gemini.
+:::
+
+## Making things up
+
+```{r}
+owner_type <- type_string("The surname of the dog's previous owner")
+
+chat <- chat_openrouter(model = "openai/gpt-6.1-terra")
+chat$chat_structured(dog_description, type = owner_type)
+```
+
+```
+[1] "Unknown"
+```
+
+The description never mentions an owner, but a required string *must* contain something. Other models will happily invent a name!
+
+## Combining them
+
+```{r}
+dogs_details <- bind_cols(dogs, output)
+dogs_details
+```
+
+```
+# A tibble: 20 × 9
+         id contact_city contact_state description         name  breed
+      <dbl> <chr>        <chr>         <chr>               <chr> <chr>
+ 1 44520267 Anoka        MN            "Boris is a handso… Boris "Min…
+ 2 44698509 Groveland    FL            "Duke is an almost… Duke  "Pot…
+ 3 45983838 Adamstown    MD            "Zac Woof-ron is a… Zac … "Red…
+# ℹ 17 more rows
+# ℹ 3 more variables: adoption_fee <dbl>, other_dogs <lgl>, age <fct>
+```
+
+## Save to a file
+
+```{r}
+readr::write_csv(dogs_details, "data/dogs_details.csv")
+```
 
 ## Your turn
 

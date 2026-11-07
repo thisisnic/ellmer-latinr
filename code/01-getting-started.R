@@ -32,11 +32,6 @@ chat
 chat <- chat_openrouter(model = "openai/gpt-6.1-terra")
 chat$chat("What were we saying earlier?")
 
-## Training cutoff date
-
-chat$chat("what date is it right now?")
-chat$chat("Are you sure about that?")
-
 ## Your turn
 
 # 1. Set up your API key using usethis::edit_r_environ() + restart R
