@@ -5,23 +5,13 @@ library(ellmer)
 library(dplyr)
 
 dogs <- readr::read_csv("data/dogs.csv")
-
-dog_description <- dogs |>
-  slice(1) |>
-  pull(description)
+dog_description <- dogs$description[1]
 
 ## The problem with unstructured output
 
-chat <- chat_openrouter(model = "anthropic/claude-haiku-5.5")
-output <- chat$chat(
-  "Extract the name and adoption fee from this data
-
-  ## Output format
-
-  Name:
-  Adoption fee:",
-  dog_description
-)
+# Back to the chat from section 2 (Sonnet, with the detailed system prompt).
+# It looks like data, but it's one long string
+output <- chat$chat("Summarise this dog:", dog_description)
 output
 class(output)
 
@@ -64,15 +54,21 @@ likes_type <- type_array(type_string("Things the dog likes"))
 chat <- chat_openrouter(model = "anthropic/claude-haiku-5.5")
 chat$chat_structured(dog_description, type = likes_type)
 
+## Your turn (1)
+
+# 1. Pick a couple of dogs from dogs
+# 2. Use chat_structured() to extract a few things from each - a string, a
+#    number, a yes/no...
+# 3. Try a type_enum() for something with a fixed set of answers, e.g. the
+#    dog's size
+
 ## Combining multiple fields
 
 dog_spec <- type_object(
   name = type_string("The name of the dog"),
   breed = type_string("Breed of the dog"),
   adoption_fee = type_number("Adoption fee in dollars"),
-  other_dogs = type_boolean(
-    "Is the dog recommended for a home with other dogs?",
-  ),
+  other_dogs = type_boolean("Is the dog recommended for a home with other dogs?"),
   age = type_enum(age_groups, "Age group of the dog")
 )
 
@@ -81,11 +77,13 @@ chat$chat_structured(dog_description, type = dog_spec)
 
 ## Processing multiple dogs
 
-prompts <- paste("Extract data from this dog adoption listing:", dogs$description)
+prompts <- paste(
+  "Extract data from this dog adoption listing:",
+  dogs$description
+)
 
-prompts
-
-# parallel_chat_structured is a little different
+# parallel_chat_structured() is a little different: a chat object, a list
+# of prompts, and a type. Returns one data frame
 output <- parallel_chat_structured(
   chat = chat_openrouter(model = "anthropic/claude-haiku-5.5"),
   prompts = as.list(prompts),
@@ -94,19 +92,40 @@ output <- parallel_chat_structured(
 
 output
 
-## Combining them
+## Combining with the original data and saving (we use this in section 4)
 
 dogs_details <- bind_cols(dogs, output)
+readr::write_csv(dogs_details, "data/dogs_details.csv")
 dogs_details
 
-## Save to a file
+## Your turn (2)
 
-readr::write_csv(dogs_details, "data/dogs_details.csv")
+# 1. Build a type_object() with 3 or 4 fields you'd want to know about a dog
+# 2. Run it over every dog with parallel_chat_structured()
+# 3. Look through the results - anything that doesn't look right?
 
-## Your turn
+## Making things up
 
-# 1. Pick a different dog from the dataset
-# 2. Extract the name and age group using chat_structured()
-# 3. Process all dogs using parallel_chat_structured()
-# 4. Bonus: Add a new field for the dog's energy level using type_enum() with
-#    choices like "Low", "Medium", "High"
+# The description never mentions an owner, but a required string must
+# contain something
+owner_type <- type_string("The surname of the dog's previous owner")
+
+chat <- chat_openrouter(model = "anthropic/claude-haiku-5.5")
+chat$chat_structured(dog_description, type = owner_type)
+
+## When the data isn't there: required = FALSE returns NULL instead
+
+owner_type <- type_string(
+  "The surname of the dog's previous owner",
+  required = FALSE
+)
+
+chat <- chat_openrouter(model = "anthropic/claude-haiku-5.5")
+chat$chat_structured(dog_description, type = owner_type)
+
+## Your turn (3)
+
+# 1. Take your type_object() from the last exercise and make the fields that
+#    might be missing required = FALSE
+# 2. Run it over every dog again
+# 3. Compare with your earlier results - what changed?

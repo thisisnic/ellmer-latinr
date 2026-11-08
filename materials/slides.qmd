@@ -670,26 +670,25 @@ By the end of this section you'll be able to:
 
 ## The problem with unstructured output
 
+Back to the chat from section 2, with its nicely formatted output:
+
 ```{r}
-chat <- chat_openrouter(model = "anthropic/claude-haiku-5.5")
-output <- chat$chat(
-  "Extract the name and adoption fee from this data
-
-  ## Output format
-
-  Name:
-  Adoption fee:",
-  dog_description
-)
+output <- chat$chat("Summarise this dog:", dog_description)
 output
 class(output)
 ```
 
 ```
 Name: Boris
-Adoption fee: $300
+Summary: Boris is a handsome, special needs mini schnauzer who needs
+biweekly B-12 shots and a vegan prescription diet.
+Age group: Adult
+Likes and dislikes: Likes rope toys and running around his foster
+mom's yard. ...
 [1] "ellmer_output"
 ```
+
+It *looks* like data, but it's one long string
 
 ## The problem with free-form LLM responses
 
@@ -797,6 +796,18 @@ chat$chat_structured(dog_description, type = likes_type)
 [2] "Running around his foster mom's yard"
 ```
 
+## Your turn
+
+1. Pick a couple of dogs from `dogs`
+2. Use `chat_structured()` to extract a few things from each - a string, a number, a yes/no...
+3. Try a `type_enum()` for something with a fixed set of answers, e.g. the dog's size
+
+```{r}
+#| echo: false
+#| eval: true
+countdown::countdown(minutes = 10)
+```
+
 ## Combining multiple fields {.smaller}
 
 Use `type_object()` to extract multiple pieces of information at once:
@@ -878,39 +889,11 @@ output
 # ℹ 10 more rows
 ```
 
-## When the data isn't there
-
-- Duke's fee came back as `0`, and several breeds as `"Unknown"`
-- Every field was *required*, so the model had to put something
-- `required = FALSE` lets the model return `NULL` instead of guessing
-
-```{r}
-breed_type <- type_string("Breed of the dog", required = FALSE)
-```
-
-::: notes
-Reduce hallucination with optional fields. Note: at time of writing this errored with OpenAI models via OpenRouter, worked with Gemini - check it works with Haiku.
-:::
-
-## Making things up
-
-```{r}
-owner_type <- type_string("The surname of the dog's previous owner")
-
-chat <- chat_openrouter(model = "anthropic/claude-haiku-5.5")
-chat$chat_structured(dog_description, type = owner_type)
-```
-
-```
-[1] "Unknown"
-```
-
-The description never mentions an owner, but a required string *must* contain something. Other models will happily invent a name!
-
-## Combining them
+## Combining with the original data and saving
 
 ```{r}
 dogs_details <- bind_cols(dogs, output)
+readr::write_csv(dogs_details, "data/dogs_details.csv")
 dogs_details
 ```
 
@@ -925,23 +908,65 @@ dogs_details
 # ℹ 3 more variables: adoption_fee <dbl>, other_dogs <lgl>, age <fct>
 ```
 
-## Save to a file
-
-```{r}
-readr::write_csv(dogs_details, "data/dogs_details.csv")
-```
+We'll use this file in section 4
 
 ## Your turn
 
-1. Pick a different dog from the dataset
-2. Extract the name and age group using `chat_structured()`
-3. Process all dogs using `parallel_chat_structured()`
-4. **Bonus:** add an energy level field using `type_enum()` with choices like "Low", "Medium", "High"
+1. Build a `type_object()` with 3 or 4 fields you'd want to know about a dog
+2. Run it over every dog with `parallel_chat_structured()`
+3. Look through the results - anything that doesn't look right?
 
 ```{r}
 #| echo: false
 #| eval: true
-countdown::countdown(minutes = 15)
+countdown::countdown(minutes = 8)
+```
+
+## Making things up
+
+```{r}
+owner_type <- type_string("The surname of the dog's previous owner")
+
+chat <- chat_openrouter(model = "anthropic/claude-haiku-5.5")
+chat$chat_structured(dog_description, type = owner_type)
+```
+
+```
+[1] "Unknown"
+```
+
+The description never mentions an owner, but a required string *must* contain something. Duke's fee came back as `0` for the same reason. Other models will happily invent a name!
+
+## When the data isn't there
+
+`required = FALSE` lets the model return `NULL` instead of guessing
+
+```{r}
+owner_type <- type_string(
+  "The surname of the dog's previous owner",
+  required = FALSE
+)
+
+chat <- chat_openrouter(model = "anthropic/claude-haiku-5.5")
+chat$chat_structured(dog_description, type = owner_type)
+```
+
+```
+NULL
+```
+
+Works inside `type_object()` too - optional fields come back as `NULL` in the list, `NA` in the data frame
+
+## Your turn
+
+1. Take your `type_object()` from the last exercise and make the fields that might be missing `required = FALSE`
+2. Run it over every dog again
+3. Compare with your earlier results - what changed?
+
+```{r}
+#| echo: false
+#| eval: true
+countdown::countdown(minutes = 5)
 ```
 
 # 4 - Tool Calling
