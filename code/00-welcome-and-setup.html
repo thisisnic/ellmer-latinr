@@ -163,6 +163,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <a class="dropdown-item" href="../code/04-tool-calling.html">
  <span class="dropdown-text">4: Tool Calling</span></a>
   </li>  
+        <li>
+    <a class="dropdown-item" href="../code/05-other-libraries.html">
+ <span class="dropdown-text">5 (Bonus): Other Libraries for LLMs in R</span></a>
+  </li>  
     </ul>
   </li>
 </ul>
@@ -249,7 +253,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="do">## Check ellmer can talk to the provider</span></span>
 <span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ellmer)</span>
-<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>chat <span class="ot">&lt;-</span> <span class="fu">chat_openrouter</span>(<span class="at">model =</span> <span class="st">"openai/gpt-6.1-terra"</span>)</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>chat <span class="ot">&lt;-</span> <span class="fu">chat_openrouter</span>(<span class="at">model =</span> <span class="st">"anthropic/claude-haiku-5.5"</span>)</span>
 <span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>chat<span class="sc">$</span><span class="fu">chat</span>(<span class="st">"Say hello in one short sentence."</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 

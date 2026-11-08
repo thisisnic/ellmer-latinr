@@ -2387,7 +2387,7 @@ Nic Crane
 </ul>
 <div class="cell">
 <div class="cell-output-display">
-<countdown-timer class="countdown" id="timer_30120ba9" minutes="3" seconds="0" update-every="1" tabindex="0" style="right:0;bottom:0;"></countdown-timer>
+<countdown-timer class="countdown" id="timer_29fcfb39" minutes="3" seconds="0" update-every="1" tabindex="0" style="right:0;bottom:0;"></countdown-timer>
 </div>
 </div>
 </section>
@@ -2403,7 +2403,7 @@ Nic Crane
 <h2>Working on Posit Cloud</h2>
 <ul>
 <li><a href="https://posit.cloud/" class="uri">https://posit.cloud/</a></li>
-<li>Or your own laptop, if you’ve done the prework</li>
+<li>Or your own laptop</li>
 </ul>
 </section>
 <section id="codeexamples" class="slide level2">
@@ -2419,21 +2419,6 @@ Nic Crane
 <li>Need an API key</li>
 <li>You should have received one today</li>
 <li>If you haven’t, let us know!</li>
-</ul>
-</section></section>
-<section>
-<section id="getting-started-with-llms-in-r" class="title-slide slide level1 center">
-<h1>1 - Getting Started with LLMs in R</h1>
-
-</section>
-<section id="learning-objectives" class="slide level2">
-<h2>Learning objectives</h2>
-<p>By the end of this section you’ll be able to:</p>
-<ul>
-<li>Set up an API key and connect to an LLM from R</li>
-<li>Send messages and read the replies</li>
-<li>Hold a multi-turn conversation, and understand why earlier messages affect later answers</li>
-<li>Start a fresh chat when you need to</li>
 </ul>
 </section>
 <section id="setting-up-your-api-key" class="slide level2">
@@ -2455,6 +2440,21 @@ Nic Crane
 <p>Save your API key at the bottom of the file like this: <br><br></p>
 <pre><code>OPENROUTER_API_KEY=sk12345567890</code></pre>
 <p><br> <em>Important: After saving, restart R for the key to take effect.</em></p>
+</section></section>
+<section>
+<section id="getting-started-with-llms-in-r" class="title-slide slide level1 center">
+<h1>1 - Getting Started with LLMs in R</h1>
+
+</section>
+<section id="learning-objectives" class="slide level2">
+<h2>Learning objectives</h2>
+<p>By the end of this section you’ll be able to:</p>
+<ul>
+<li>Connect to an LLM from R and send it messages</li>
+<li>Hold a multi-turn conversation, and understand why earlier messages affect later answers</li>
+<li>See what a chat object contains, and how many tokens you’re using</li>
+<li>Start a fresh chat when you need to</li>
+</ul>
 </section>
 <section id="the-ellmer-r-package" class="slide level2">
 <h2>The ellmer R package</h2>
@@ -2513,14 +2513,57 @@ Nic Crane
 </table>
 <p>…and many more</p>
 </section>
+<section id="choosing-a-model" class="slide level2">
+<h2>Choosing a model</h2>
+<p>Models differ on:</p>
+<ul>
+<li><strong>Capability</strong> - reasoning, coding, following complex instructions</li>
+<li><strong>Speed</strong> - small models answer in a second, big ones take longer</li>
+<li><strong>Cost</strong> - priced per token, and can vary 100x between models</li>
+<li><strong>Context window</strong> - how much text you can send at once</li>
+<li><strong>Features</strong> - vision, tool calling, structured output</li>
+</ul>
+<p>Start with a small, cheap model. Move up only if it isn’t good enough.</p>
+</section>
 <section id="this-workshop" class="slide level2">
 <h2>This workshop</h2>
 <ul>
 <li>OpenRouter - one API key, access to models from many providers</li>
-<li>Models are named <code>provider/model</code>, e.g. <code>&quot;openai/gpt-6.1-terra&quot;</code></li>
+<li>Models are named <code>provider/model</code>, e.g. <code>&quot;anthropic/claude-haiku-5.5&quot;</code></li>
 </ul>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href></a><span class="fu">chat_openrouter</span>(<span class="at">model =</span> <span class="st">&quot;openai/gpt-6.1-terra&quot;</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href></a><span class="fu">chat_openrouter</span>(<span class="at">model =</span> <span class="st">&quot;anthropic/claude-haiku-5.5&quot;</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="starting-a-conversation" class="slide level2">
+<h2>Starting a conversation</h2>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href></a><span class="fu">library</span>(ellmer)</span>
+<span id="cb4-2"><a href></a>chat <span class="ot">&lt;-</span> <span class="fu">chat_openrouter</span>(<span class="at">model =</span> <span class="st">&quot;anthropic/claude-haiku-5.5&quot;</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="sending-a-message-to-the-llm" class="slide level2">
+<h2>Sending a message to the LLM</h2>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href></a>chat<span class="sc">$</span><span class="fu">chat</span>(<span class="st">&quot;What is the most popular dog breed in the world?</span></span>
+<span id="cb5-2"><a href></a><span class="st">  Answer succinctly.&quot;</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<pre><code>The Labrador Retriever is generally considered the most popular dog
+breed in the world, based on registration statistics (such as the
+American Kennel Club&#39;s rankings), though exact global rankings vary
+by country and data source.</code></pre>
+</section>
+<section id="your-turn" class="slide level2">
+<h2>Your turn</h2>
+<ol type="1">
+<li>If you haven’t yet: save your API key with <code>usethis::edit_r_environ()</code> and restart R</li>
+<li>Start a conversation: <code>chat &lt;- chat_openrouter(model = &quot;anthropic/claude-haiku-5.5&quot;)</code></li>
+<li>Ask it a question with <code>chat$chat()</code> and check you get an answer back</li>
+</ol>
+<div class="cell">
+<div class="cell-output-display">
+<countdown-timer class="countdown" id="timer_cf66e42d" minutes="10" seconds="0" update-every="1" tabindex="0" style="right:0;bottom:0;"></countdown-timer>
+</div>
 </div>
 </section>
 <section id="ellmer-conversations-and-turns" class="slide level2">
@@ -2545,15 +2588,6 @@ Nic Crane
 </div>
 </div>
 </section>
-<section id="context" class="slide level2">
-<h2>Context</h2>
-<ul>
-<li>LLMs can’t “remember” past conversation</li>
-<li>every time you send a new message, entire conversation history sent with it</li>
-<li>context - grows every turn</li>
-<li>context window: how much you can send, measured in tokens</li>
-</ul>
-</section>
 <section id="tokens" class="slide level2">
 <h2>Tokens</h2>
 <ul>
@@ -2562,58 +2596,62 @@ Nic Crane
 <li>in English, 1 token is around 0.75 words</li>
 </ul>
 </section>
-<section id="starting-a-conversation" class="slide level2">
-<h2>Starting a conversation</h2>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href></a><span class="fu">library</span>(ellmer)</span>
-<span id="cb4-2"><a href></a>chat <span class="ot">&lt;-</span> <span class="fu">chat_openrouter</span>(<span class="at">model =</span> <span class="st">&quot;openai/gpt-6.1-terra&quot;</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
-</section>
-<section id="sending-a-message-to-the-llm" class="slide level2">
-<h2>Sending a message to the LLM</h2>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href></a>chat<span class="sc">$</span><span class="fu">chat</span>(<span class="st">&quot;What is the most popular dog breed in the world?</span></span>
-<span id="cb5-2"><a href></a><span class="st">  Answer succinctly.&quot;</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
-<pre><code>The **Labrador Retriever** is widely considered the world&#39;s most
-popular dog breed, though there&#39;s no definitive global count.</code></pre>
-</section>
-<section id="turns" class="slide level2">
-<h2>Turns</h2>
+<section id="whats-in-the-chat-object" class="slide level2 smaller">
+<h2>What’s in the chat object?</h2>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href></a>chat</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<pre><code>&lt;Chat OpenRouter/openai/gpt-6.1-terra turns=2 input=22 output=92&gt;
+<pre><code>&lt;Chat OpenRouter/anthropic/claude-haiku-5.5 turns=2 input=32 output=66&gt;
 ── user ────────────────────────────────────────────────────
 What is the most popular dog breed in the world?
   Answer succinctly.
-── assistant [input=22 output=92] ──────────────────────────
-&lt;thinking&gt; ... &lt;/thinking&gt;
-
-The **Labrador Retriever** is widely considered the world&#39;s most
-popular dog breed, though there&#39;s no definitive global count.</code></pre>
+── assistant [input=32 output=66] ──────────────────────────
+The Labrador Retriever is generally considered the most popular dog
+breed in the world, based on registration statistics (such as the
+American Kennel Club&#39;s rankings), though exact global rankings vary
+by country and data source.</code></pre>
+<ul>
+<li class="fragment"><strong>Provider and model</strong> - <code>OpenRouter/anthropic/claude-haiku-5.5</code></li>
+<li class="fragment"><strong>Turns</strong> - 2 so far: one <strong>user</strong> turn, one <strong>assistant</strong> turn</li>
+<li class="fragment"><strong>Tokens</strong> - 32 in, 66 out. Tokens are what you pay for</li>
+</ul>
+</section>
+<section id="counting-tokens" class="slide level2">
+<h2>Counting tokens</h2>
+<p><code>token_usage()</code> totals every call made in this R session, across all chats:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href></a><span class="fu">token_usage</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<pre><code>    provider                      model input output cached_input price
+1 OpenRouter anthropic/claude-haiku-5.5    32     66            0    NA</code></pre>
+<p>Handy for keeping an eye on usage when you start looping over data. Price is <code>NA</code> here because OpenRouter doesn’t report it - check your OpenRouter dashboard instead.</p>
 </section>
 <section id="continuing-the-conversation" class="slide level2">
 <h2>Continuing the conversation</h2>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href></a>chat<span class="sc">$</span><span class="fu">chat</span>(<span class="st">&quot;What are they like to live with?&quot;</span>)</span>
-<span id="cb9-2"><a href></a>chat<span class="sc">$</span><span class="fu">chat</span>(<span class="st">&quot;How long do they usually live?&quot;</span>)</span>
-<span id="cb9-3"><a href></a>chat</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href></a>chat<span class="sc">$</span><span class="fu">chat</span>(<span class="st">&quot;How long does this breed of dog usually live?&quot;</span>)</span>
+<span id="cb11-2"><a href></a>chat</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<pre><code>&lt;Chat OpenRouter/openai/gpt-6.1-terra turns=6 input=236 output=183&gt;
+<pre><code>&lt;Chat OpenRouter/anthropic/claude-haiku-5.5 turns=4 input=145 output=101&gt;
 ── user ────────────────────────────────────────────────────
 What is the most popular dog breed in the world? ...
-── assistant [input=22 output=92] ──────────────────────────
-The **Labrador Retriever** is widely considered ...
+── assistant [input=32 output=66] ──────────────────────────
+The Labrador Retriever is generally considered the most popular ...
 ── user ────────────────────────────────────────────────────
-What are they like to live with?
-── assistant [input=66 output=69] ──────────────────────────
-Labradors are generally friendly, affectionate, and eager to ...
-── user ────────────────────────────────────────────────────
-How long do they usually live?
-── assistant [input=148 output=22] ─────────────────────────
-Labrador Retrievers usually live **10–12 years**, though some
-live longer.</code></pre>
+How long does this breed of dog usually live?
+── assistant [input=113 output=35] ─────────────────────────
+Labrador Retrievers typically live about 10 to 12 years, though
+some live into their mid-teens.</code></pre>
+<p>Notice the input tokens went up - and the model knew which breed we meant</p>
+</section>
+<section id="context" class="slide level2">
+<h2>Context</h2>
+<ul>
+<li>The model knew what “this breed” meant - but LLMs can’t “remember” anything</li>
+<li>Every time you send a message, ellmer sends the <strong>entire conversation history</strong> with it</li>
+<li>That history is the <strong>context</strong>, and it grows every turn</li>
+<li>The <strong>context window</strong> is how much you can send at once, measured in tokens</li>
+</ul>
 </section>
 <section id="cumulative-nature-of-tokens" class="slide level2">
 <h2>Cumulative nature of tokens</h2>
@@ -2645,32 +2683,75 @@ live longer.</code></pre>
 <section id="reset---just-start-a-new-chat" class="slide level2">
 <h2>Reset - just start a new chat</h2>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href></a>chat <span class="ot">&lt;-</span> <span class="fu">chat_openrouter</span>(<span class="at">model =</span> <span class="st">&quot;openai/gpt-6.1-terra&quot;</span>)</span>
-<span id="cb11-2"><a href></a>chat<span class="sc">$</span><span class="fu">chat</span>(<span class="st">&quot;What were we saying earlier?&quot;</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href></a>chat <span class="ot">&lt;-</span> <span class="fu">chat_openrouter</span>(<span class="at">model =</span> <span class="st">&quot;anthropic/claude-haiku-5.5&quot;</span>)</span>
+<span id="cb13-2"><a href></a>chat<span class="sc">$</span><span class="fu">chat</span>(<span class="st">&quot;What is its favourite food?&quot;</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<pre><code>I don&#39;t see any earlier messages in this conversation. What topic
-did you have in mind?</code></pre>
+<pre><code>I&#39;m not sure what &quot;its&quot; refers to. Could you tell me which animal,
+character, or thing you mean? Once I know, I can tell you what&#39;s
+known about its favourite food...</code></pre>
+<p>A new chat object has no history - the Labrador is gone</p>
 </section>
 <section id="chatting-interactively" class="slide level2">
 <h2>Chatting interactively</h2>
 <p>Typing <code>chat$chat()</code> every time gets old. Two shortcuts:</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href></a><span class="fu">live_console</span>(chat)   <span class="co"># chat in the R console, type Q to quit</span></span>
-<span id="cb13-2"><a href></a><span class="fu">live_browser</span>(chat)   <span class="co"># chat in a browser window</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href></a><span class="fu">live_console</span>(chat)   <span class="co"># chat in the R console, type Q to quit</span></span>
+<span id="cb15-2"><a href></a><span class="fu">live_browser</span>(chat)   <span class="co"># chat in a browser window</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>Both carry on the same conversation - <code>chat</code> still has all the turns afterwards.</p>
 </section>
-<section id="your-turn" class="slide level2">
+<section id="your-turn-1" class="slide level2">
 <h2>Your turn</h2>
 <ol type="1">
-<li>Set up your API key using <code>usethis::edit_r_environ()</code> + restart R</li>
-<li>Start a conversation: <code>chat_openrouter(model = &quot;openai/gpt-6.1-terra&quot;)</code></li>
-<li>Paste one dog’s description from <code>dogs.csv</code> and ask: <em>would this dog suit a flat with no garden?</em></li>
+<li>Start a new chat and open it with <code>live_browser(chat)</code></li>
+<li>Ask a few questions, including a follow-up that relies on an earlier answer</li>
+<li>Close the browser window, then print <code>chat</code> - what do you see?</li>
+</ol>
+<div class="cell">
+<div class="cell-output-display">
+<countdown-timer class="countdown" id="timer_2a988d8b" minutes="10" seconds="0" update-every="1" tabindex="0" style="right:0;bottom:0;"></countdown-timer>
+</div>
+</div>
+</section>
+<section id="todays-data-dog-adoption-listings" class="slide level2">
+<h2>Today’s data: dog adoption listings</h2>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href></a><span class="fu">library</span>(readr)</span>
+<span id="cb16-2"><a href></a>dogs <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">&quot;data/dogs.csv&quot;</span>)</span>
+<span id="cb16-3"><a href></a><span class="fu">View</span>(dogs)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<ul>
+<li>One row per dog, from a US adoption site</li>
+<li>The <code>description</code> column is free text written by the shelter - that’s what we’ll be working with</li>
+</ul>
+</section>
+<section id="giving-the-model-something-to-work-with" class="slide level2">
+<h2>Giving the model something to work with</h2>
+<p><code>chat$chat()</code> takes any number of pieces of content and sends them together:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href></a>boris <span class="ot">&lt;-</span> dogs<span class="sc">$</span>description[<span class="dv">1</span>]</span>
+<span id="cb17-2"><a href></a></span>
+<span id="cb17-3"><a href></a>chat <span class="ot">&lt;-</span> <span class="fu">chat_openrouter</span>(<span class="at">model =</span> <span class="st">&quot;anthropic/claude-haiku-5.5&quot;</span>)</span>
+<span id="cb17-4"><a href></a>chat<span class="sc">$</span><span class="fu">chat</span>(<span class="st">&quot;Give me a quick summary of this dog&quot;</span>, boris)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<pre><code>**Boris** is a 4-year-old mini schnauzer under 10 pounds who arrived
+from Arkansas in April 2019. He&#39;s handsome, loves rope toys, and
+enjoys running around his foster mom&#39;s yard. He has special needs:
+he requires vitamin B-12 shots every other week (this may change)
+and a prescription, no-meat, no-protein diet, described as vegan.
+
+The adoption fee is $300. ...</code></pre>
+</section>
+<section id="your-turn-2" class="slide level2">
+<h2>Your turn</h2>
+<ol type="1">
+<li>Pick a different dog from <code>dogs</code> and pass its description to <code>chat$chat()</code></li>
+<li>Ask: <em>would this dog suit a flat with no garden?</em></li>
 <li>Ask a follow-up question without repeating the description</li>
 </ol>
 <div class="cell">
 <div class="cell-output-display">
-<countdown-timer class="countdown" id="timer_90c490b1" minutes="10" seconds="0" update-every="1" tabindex="0" style="right:0;bottom:0;"></countdown-timer>
+<countdown-timer class="countdown" id="timer_864e32b2" minutes="5" seconds="0" update-every="1" tabindex="0" style="right:0;bottom:0;"></countdown-timer>
 </div>
 </div>
 </section></section>
@@ -2688,19 +2769,16 @@ did you have in mind?</code></pre>
 <li>Understand why the same prompt still gives varying answers</li>
 </ul>
 </section>
-<section id="load-the-data-to-work-with" class="slide level2">
-<h2>Load the data to work with</h2>
+<section id="back-to-boris" class="slide level2">
+<h2>Back to Boris</h2>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href></a><span class="fu">library</span>(ellmer)</span>
-<span id="cb14-2"><a href></a><span class="fu">library</span>(dplyr)</span>
-<span id="cb14-3"><a href></a></span>
-<span id="cb14-4"><a href></a>dogs <span class="ot">&lt;-</span> readr<span class="sc">::</span><span class="fu">read_csv</span>(<span class="st">&quot;data/dogs.csv&quot;</span>)</span>
-<span id="cb14-5"><a href></a></span>
-<span id="cb14-6"><a href></a>dog_description <span class="ot">&lt;-</span> dogs <span class="sc">|&gt;</span></span>
-<span id="cb14-7"><a href></a>  <span class="fu">slice</span>(<span class="dv">1</span>) <span class="sc">|&gt;</span></span>
-<span id="cb14-8"><a href></a>  <span class="fu">pull</span>(description)</span>
-<span id="cb14-9"><a href></a></span>
-<span id="cb14-10"><a href></a>dog_description</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href></a><span class="fu">library</span>(ellmer)</span>
+<span id="cb19-2"><a href></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb19-3"><a href></a></span>
+<span id="cb19-4"><a href></a>dogs <span class="ot">&lt;-</span> readr<span class="sc">::</span><span class="fu">read_csv</span>(<span class="st">&quot;data/dogs.csv&quot;</span>)</span>
+<span id="cb19-5"><a href></a>dog_description <span class="ot">&lt;-</span> dogs<span class="sc">$</span>description[<span class="dv">1</span>]</span>
+<span id="cb19-6"><a href></a></span>
+<span id="cb19-7"><a href></a>dog_description</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <pre><code>Boris is a handsome mini schnauzer who made his long trek up her
 from Arkansas on 4/2019. He loves rope toys and running around his
@@ -2717,8 +2795,8 @@ we can set up a meet and greet for you! ...</code></pre>
 <section id="without-guidance-the-model-decides-what-matters" class="slide level2">
 <h2>Without guidance, the model decides what matters</h2>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href></a>chat <span class="ot">&lt;-</span> <span class="fu">chat_openrouter</span>(<span class="at">model =</span> <span class="st">&quot;openai/gpt-6.1-terra&quot;</span>)</span>
-<span id="cb16-2"><a href></a>chat<span class="sc">$</span><span class="fu">chat</span>(<span class="st">&quot;Summarise this dog:&quot;</span>, dog_description)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href></a>chat <span class="ot">&lt;-</span> <span class="fu">chat_openrouter</span>(<span class="at">model =</span> <span class="st">&quot;anthropic/claude-haiku-5.5&quot;</span>)</span>
+<span id="cb21-2"><a href></a>chat<span class="sc">$</span><span class="fu">chat</span>(<span class="st">&quot;Summarise this dog:&quot;</span>, dog_description)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <pre><code>Boris is a 4-year-old mini schnauzer weighing just under 10 pounds.
 He loves rope toys and running around the yard. He has special
@@ -2738,22 +2816,22 @@ http://www.aohrescue.org/dog-adoption-application.</code></pre>
 <section id="setting-the-system-prompt" class="slide level2">
 <h2>Setting the system prompt</h2>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href></a>prompt <span class="ot">&lt;-</span> <span class="st">&quot;You are a dog adoption assistant helping people find dogs to adopt.</span></span>
-<span id="cb18-2"><a href></a><span class="st">Summarise the dog description you are given to help potential adopters decide</span></span>
-<span id="cb18-3"><a href></a><span class="st">if the dog is a good fit for them. Respond in 50 words or fewer.</span></span>
-<span id="cb18-4"><a href></a></span>
-<span id="cb18-5"><a href></a><span class="st">## Output format</span></span>
-<span id="cb18-6"><a href></a></span>
-<span id="cb18-7"><a href></a><span class="st">Name: the dog&#39;s name</span></span>
-<span id="cb18-8"><a href></a><span class="st">Summary: a 1 sentence description</span></span>
-<span id="cb18-9"><a href></a><span class="st">Age group: one of Baby, Young, Adult, Senior</span></span>
-<span id="cb18-10"><a href></a><span class="st">Likes and dislikes: what the dog does and doesn&#39;t enjoy&quot;</span></span>
-<span id="cb18-11"><a href></a></span>
-<span id="cb18-12"><a href></a>chat <span class="ot">&lt;-</span> <span class="fu">chat_openrouter</span>(</span>
-<span id="cb18-13"><a href></a>  <span class="at">model =</span> <span class="st">&quot;openai/gpt-6.1-terra&quot;</span>,</span>
-<span id="cb18-14"><a href></a>  <span class="at">system_prompt =</span> prompt</span>
-<span id="cb18-15"><a href></a>)</span>
-<span id="cb18-16"><a href></a>chat<span class="sc">$</span><span class="fu">chat</span>(<span class="st">&quot;Summarise this dog:&quot;</span>, dog_description)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href></a>prompt <span class="ot">&lt;-</span> <span class="st">&quot;You are a dog adoption assistant helping people find dogs to adopt.</span></span>
+<span id="cb23-2"><a href></a><span class="st">Summarise the dog description you are given to help potential adopters decide</span></span>
+<span id="cb23-3"><a href></a><span class="st">if the dog is a good fit for them. Respond in 50 words or fewer.</span></span>
+<span id="cb23-4"><a href></a></span>
+<span id="cb23-5"><a href></a><span class="st">## Output format</span></span>
+<span id="cb23-6"><a href></a></span>
+<span id="cb23-7"><a href></a><span class="st">Name: the dog&#39;s name</span></span>
+<span id="cb23-8"><a href></a><span class="st">Summary: a 1 sentence description</span></span>
+<span id="cb23-9"><a href></a><span class="st">Age group: one of Baby, Young, Adult, Senior</span></span>
+<span id="cb23-10"><a href></a><span class="st">Likes and dislikes: what the dog does and doesn&#39;t enjoy&quot;</span></span>
+<span id="cb23-11"><a href></a></span>
+<span id="cb23-12"><a href></a>chat <span class="ot">&lt;-</span> <span class="fu">chat_openrouter</span>(</span>
+<span id="cb23-13"><a href></a>  <span class="at">model =</span> <span class="st">&quot;anthropic/claude-haiku-5.5&quot;</span>,</span>
+<span id="cb23-14"><a href></a>  <span class="at">system_prompt =</span> prompt</span>
+<span id="cb23-15"><a href></a>)</span>
+<span id="cb23-16"><a href></a>chat<span class="sc">$</span><span class="fu">chat</span>(<span class="st">&quot;Summarise this dog:&quot;</span>, dog_description)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
 <section id="setting-the-system-prompt---output" class="slide level2">
@@ -2769,11 +2847,11 @@ dislikes are not specified.</code></pre>
 <section id="run-it-again-thoughresponses-vary" class="slide level2 smaller">
 <h2>Run it again though…responses vary</h2>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href></a>chat <span class="ot">&lt;-</span> <span class="fu">chat_openrouter</span>(</span>
-<span id="cb20-2"><a href></a>  <span class="at">model =</span> <span class="st">&quot;openai/gpt-6.1-terra&quot;</span>,</span>
-<span id="cb20-3"><a href></a>  <span class="at">system_prompt =</span> prompt</span>
-<span id="cb20-4"><a href></a>)</span>
-<span id="cb20-5"><a href></a>chat<span class="sc">$</span><span class="fu">chat</span>(<span class="st">&quot;Summarise this dog:&quot;</span>, dog_description)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href></a>chat <span class="ot">&lt;-</span> <span class="fu">chat_openrouter</span>(</span>
+<span id="cb25-2"><a href></a>  <span class="at">model =</span> <span class="st">&quot;anthropic/claude-haiku-5.5&quot;</span>,</span>
+<span id="cb25-3"><a href></a>  <span class="at">system_prompt =</span> prompt</span>
+<span id="cb25-4"><a href></a>)</span>
+<span id="cb25-5"><a href></a>chat<span class="sc">$</span><span class="fu">chat</span>(<span class="st">&quot;Summarise this dog:&quot;</span>, dog_description)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <pre><code>Name: Boris
 Summary: Boris is a 4-year-old mini schnauzer under 10 pounds who
@@ -2810,7 +2888,7 @@ dislikes are not stated.</code></pre>
 <p>The format holds, but it’s still free text we’d have to parse.</p>
 <p>Next: make the model return <strong>data</strong> instead.</p>
 </section>
-<section id="your-turn-1" class="slide level2">
+<section id="your-turn-3" class="slide level2">
 <h2>Your turn</h2>
 <ol type="1">
 <li>Pick a different dog from the dataset and run the prompt on it</li>
@@ -2818,7 +2896,7 @@ dislikes are not stated.</code></pre>
 </ol>
 <div class="cell">
 <div class="cell-output-display">
-<countdown-timer class="countdown" id="timer_9f0afe8f" minutes="8" seconds="0" update-every="1" tabindex="0" style="right:0;bottom:0;"></countdown-timer>
+<countdown-timer class="countdown" id="timer_e3ad5f42" minutes="8" seconds="0" update-every="1" tabindex="0" style="right:0;bottom:0;"></countdown-timer>
 </div>
 </div>
 </section></section>
@@ -2840,18 +2918,18 @@ dislikes are not stated.</code></pre>
 <section id="the-problem-with-unstructured-output" class="slide level2">
 <h2>The problem with unstructured output</h2>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href></a>chat <span class="ot">&lt;-</span> <span class="fu">chat_openrouter</span>(<span class="at">model =</span> <span class="st">&quot;openai/gpt-6.1-terra&quot;</span>)</span>
-<span id="cb22-2"><a href></a>output <span class="ot">&lt;-</span> chat<span class="sc">$</span><span class="fu">chat</span>(</span>
-<span id="cb22-3"><a href></a>  <span class="st">&quot;Extract the name and adoption fee from this data</span></span>
-<span id="cb22-4"><a href></a></span>
-<span id="cb22-5"><a href></a><span class="st">  ## Output format</span></span>
-<span id="cb22-6"><a href></a></span>
-<span id="cb22-7"><a href></a><span class="st">  Name:</span></span>
-<span id="cb22-8"><a href></a><span class="st">  Adoption fee:&quot;</span>,</span>
-<span id="cb22-9"><a href></a>  dog_description</span>
-<span id="cb22-10"><a href></a>)</span>
-<span id="cb22-11"><a href></a>output</span>
-<span id="cb22-12"><a href></a><span class="fu">class</span>(output)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href></a>chat <span class="ot">&lt;-</span> <span class="fu">chat_openrouter</span>(<span class="at">model =</span> <span class="st">&quot;anthropic/claude-haiku-5.5&quot;</span>)</span>
+<span id="cb27-2"><a href></a>output <span class="ot">&lt;-</span> chat<span class="sc">$</span><span class="fu">chat</span>(</span>
+<span id="cb27-3"><a href></a>  <span class="st">&quot;Extract the name and adoption fee from this data</span></span>
+<span id="cb27-4"><a href></a></span>
+<span id="cb27-5"><a href></a><span class="st">  ## Output format</span></span>
+<span id="cb27-6"><a href></a></span>
+<span id="cb27-7"><a href></a><span class="st">  Name:</span></span>
+<span id="cb27-8"><a href></a><span class="st">  Adoption fee:&quot;</span>,</span>
+<span id="cb27-9"><a href></a>  dog_description</span>
+<span id="cb27-10"><a href></a>)</span>
+<span id="cb27-11"><a href></a>output</span>
+<span id="cb27-12"><a href></a><span class="fu">class</span>(output)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <pre><code>Name: Boris
 Adoption fee: $300
@@ -2928,10 +3006,10 @@ Adoption fee: $300
 <section id="extracting-a-single-value" class="slide level2">
 <h2>Extracting a single value</h2>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href></a>name_type <span class="ot">&lt;-</span> <span class="fu">type_string</span>(<span class="st">&quot;The name of the dog&quot;</span>)</span>
-<span id="cb24-2"><a href></a></span>
-<span id="cb24-3"><a href></a>chat <span class="ot">&lt;-</span> <span class="fu">chat_openrouter</span>(<span class="at">model =</span> <span class="st">&quot;openai/gpt-6.1-terra&quot;</span>)</span>
-<span id="cb24-4"><a href></a>chat<span class="sc">$</span><span class="fu">chat_structured</span>(dog_description, <span class="at">type =</span> name_type)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href></a>name_type <span class="ot">&lt;-</span> <span class="fu">type_string</span>(<span class="st">&quot;The name of the dog&quot;</span>)</span>
+<span id="cb29-2"><a href></a></span>
+<span id="cb29-3"><a href></a>chat <span class="ot">&lt;-</span> <span class="fu">chat_openrouter</span>(<span class="at">model =</span> <span class="st">&quot;anthropic/claude-haiku-5.5&quot;</span>)</span>
+<span id="cb29-4"><a href></a>chat<span class="sc">$</span><span class="fu">chat_structured</span>(dog_description, <span class="at">type =</span> name_type)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <pre><code>[1] &quot;Boris&quot;</code></pre>
 <p>We get a plain string back - no “Name:” prefix to strip off!</p>
@@ -2939,10 +3017,10 @@ Adoption fee: $300
 <section id="extracting-a-number" class="slide level2">
 <h2>Extracting a number</h2>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb26"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href></a>fee_type <span class="ot">&lt;-</span> <span class="fu">type_number</span>(<span class="st">&quot;Adoption fee in dollars&quot;</span>)</span>
-<span id="cb26-2"><a href></a></span>
-<span id="cb26-3"><a href></a>chat <span class="ot">&lt;-</span> <span class="fu">chat_openrouter</span>(<span class="at">model =</span> <span class="st">&quot;openai/gpt-6.1-terra&quot;</span>)</span>
-<span id="cb26-4"><a href></a>chat<span class="sc">$</span><span class="fu">chat_structured</span>(dog_description, <span class="at">type =</span> fee_type)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb31"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href></a>fee_type <span class="ot">&lt;-</span> <span class="fu">type_number</span>(<span class="st">&quot;Adoption fee in dollars&quot;</span>)</span>
+<span id="cb31-2"><a href></a></span>
+<span id="cb31-3"><a href></a>chat <span class="ot">&lt;-</span> <span class="fu">chat_openrouter</span>(<span class="at">model =</span> <span class="st">&quot;anthropic/claude-haiku-5.5&quot;</span>)</span>
+<span id="cb31-4"><a href></a>chat<span class="sc">$</span><span class="fu">chat_structured</span>(dog_description, <span class="at">type =</span> fee_type)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <pre><code>[1] 300</code></pre>
 <p>A number, not text!</p>
@@ -2951,12 +3029,12 @@ Adoption fee: $300
 <h2>Constraining to specific choices</h2>
 <p>Remember how we had to spell out the age groups in our prompt?</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb28"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href></a>age_groups <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;Baby&quot;</span>, <span class="st">&quot;Young&quot;</span>, <span class="st">&quot;Adult&quot;</span>, <span class="st">&quot;Senior&quot;</span>)</span>
-<span id="cb28-2"><a href></a></span>
-<span id="cb28-3"><a href></a>age_type <span class="ot">&lt;-</span> <span class="fu">type_enum</span>(age_groups, <span class="st">&quot;Age group of the dog&quot;</span>)</span>
-<span id="cb28-4"><a href></a></span>
-<span id="cb28-5"><a href></a>chat <span class="ot">&lt;-</span> <span class="fu">chat_openrouter</span>(<span class="at">model =</span> <span class="st">&quot;openai/gpt-6.1-terra&quot;</span>)</span>
-<span id="cb28-6"><a href></a>chat<span class="sc">$</span><span class="fu">chat_structured</span>(dog_description, <span class="at">type =</span> age_type)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb33"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href></a>age_groups <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;Baby&quot;</span>, <span class="st">&quot;Young&quot;</span>, <span class="st">&quot;Adult&quot;</span>, <span class="st">&quot;Senior&quot;</span>)</span>
+<span id="cb33-2"><a href></a></span>
+<span id="cb33-3"><a href></a>age_type <span class="ot">&lt;-</span> <span class="fu">type_enum</span>(age_groups, <span class="st">&quot;Age group of the dog&quot;</span>)</span>
+<span id="cb33-4"><a href></a></span>
+<span id="cb33-5"><a href></a>chat <span class="ot">&lt;-</span> <span class="fu">chat_openrouter</span>(<span class="at">model =</span> <span class="st">&quot;anthropic/claude-haiku-5.5&quot;</span>)</span>
+<span id="cb33-6"><a href></a>chat<span class="sc">$</span><span class="fu">chat_structured</span>(dog_description, <span class="at">type =</span> age_type)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <pre><code>[1] &quot;Adult&quot;</code></pre>
 <p>The model <em>must</em> choose from our list.</p>
@@ -2964,22 +3042,22 @@ Adoption fee: $300
 <section id="extracting-a-yesno" class="slide level2">
 <h2>Extracting a yes/no</h2>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb30"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href></a>other_dogs_type <span class="ot">&lt;-</span> <span class="fu">type_boolean</span>(</span>
-<span id="cb30-2"><a href></a>  <span class="st">&quot;Is the dog recommended for a home with other dogs?&quot;</span></span>
-<span id="cb30-3"><a href></a>)</span>
-<span id="cb30-4"><a href></a></span>
-<span id="cb30-5"><a href></a>chat <span class="ot">&lt;-</span> <span class="fu">chat_openrouter</span>(<span class="at">model =</span> <span class="st">&quot;openai/gpt-6.1-terra&quot;</span>)</span>
-<span id="cb30-6"><a href></a>chat<span class="sc">$</span><span class="fu">chat_structured</span>(dog_description, <span class="at">type =</span> other_dogs_type)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb35"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href></a>other_dogs_type <span class="ot">&lt;-</span> <span class="fu">type_boolean</span>(</span>
+<span id="cb35-2"><a href></a>  <span class="st">&quot;Is the dog recommended for a home with other dogs?&quot;</span></span>
+<span id="cb35-3"><a href></a>)</span>
+<span id="cb35-4"><a href></a></span>
+<span id="cb35-5"><a href></a>chat <span class="ot">&lt;-</span> <span class="fu">chat_openrouter</span>(<span class="at">model =</span> <span class="st">&quot;anthropic/claude-haiku-5.5&quot;</span>)</span>
+<span id="cb35-6"><a href></a>chat<span class="sc">$</span><span class="fu">chat_structured</span>(dog_description, <span class="at">type =</span> other_dogs_type)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <pre><code>[1] FALSE</code></pre>
 </section>
 <section id="extracting-a-list-of-values" class="slide level2">
 <h2>Extracting a list of values</h2>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb32"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href></a>likes_type <span class="ot">&lt;-</span> <span class="fu">type_array</span>(<span class="fu">type_string</span>(<span class="st">&quot;Things the dog likes&quot;</span>))</span>
-<span id="cb32-2"><a href></a></span>
-<span id="cb32-3"><a href></a>chat <span class="ot">&lt;-</span> <span class="fu">chat_openrouter</span>(<span class="at">model =</span> <span class="st">&quot;openai/gpt-6.1-terra&quot;</span>)</span>
-<span id="cb32-4"><a href></a>chat<span class="sc">$</span><span class="fu">chat_structured</span>(dog_description, <span class="at">type =</span> likes_type)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb37"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href></a>likes_type <span class="ot">&lt;-</span> <span class="fu">type_array</span>(<span class="fu">type_string</span>(<span class="st">&quot;Things the dog likes&quot;</span>))</span>
+<span id="cb37-2"><a href></a></span>
+<span id="cb37-3"><a href></a>chat <span class="ot">&lt;-</span> <span class="fu">chat_openrouter</span>(<span class="at">model =</span> <span class="st">&quot;anthropic/claude-haiku-5.5&quot;</span>)</span>
+<span id="cb37-4"><a href></a>chat<span class="sc">$</span><span class="fu">chat_structured</span>(dog_description, <span class="at">type =</span> likes_type)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <pre><code>[1] &quot;Rope toys&quot;
 [2] &quot;Running around his foster mom&#39;s yard&quot;</code></pre>
@@ -2988,16 +3066,16 @@ Adoption fee: $300
 <h2>Combining multiple fields</h2>
 <p>Use <code>type_object()</code> to extract multiple pieces of information at once:</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb34"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href></a>dog_spec <span class="ot">&lt;-</span> <span class="fu">type_object</span>(</span>
-<span id="cb34-2"><a href></a>  <span class="at">name =</span> <span class="fu">type_string</span>(<span class="st">&quot;The name of the dog&quot;</span>),</span>
-<span id="cb34-3"><a href></a>  <span class="at">breed =</span> <span class="fu">type_string</span>(<span class="st">&quot;Breed of the dog&quot;</span>),</span>
-<span id="cb34-4"><a href></a>  <span class="at">adoption_fee =</span> <span class="fu">type_number</span>(<span class="st">&quot;Adoption fee in dollars&quot;</span>),</span>
-<span id="cb34-5"><a href></a>  <span class="at">other_dogs =</span> <span class="fu">type_boolean</span>(<span class="st">&quot;Is the dog recommended for a home with other dogs?&quot;</span>),</span>
-<span id="cb34-6"><a href></a>  <span class="at">age =</span> <span class="fu">type_enum</span>(age_groups, <span class="st">&quot;Age group of the dog&quot;</span>)</span>
-<span id="cb34-7"><a href></a>)</span>
-<span id="cb34-8"><a href></a></span>
-<span id="cb34-9"><a href></a>chat <span class="ot">&lt;-</span> <span class="fu">chat_openrouter</span>(<span class="at">model =</span> <span class="st">&quot;openai/gpt-6.1-terra&quot;</span>)</span>
-<span id="cb34-10"><a href></a>chat<span class="sc">$</span><span class="fu">chat_structured</span>(dog_description, <span class="at">type =</span> dog_spec)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb39"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href></a>dog_spec <span class="ot">&lt;-</span> <span class="fu">type_object</span>(</span>
+<span id="cb39-2"><a href></a>  <span class="at">name =</span> <span class="fu">type_string</span>(<span class="st">&quot;The name of the dog&quot;</span>),</span>
+<span id="cb39-3"><a href></a>  <span class="at">breed =</span> <span class="fu">type_string</span>(<span class="st">&quot;Breed of the dog&quot;</span>),</span>
+<span id="cb39-4"><a href></a>  <span class="at">adoption_fee =</span> <span class="fu">type_number</span>(<span class="st">&quot;Adoption fee in dollars&quot;</span>),</span>
+<span id="cb39-5"><a href></a>  <span class="at">other_dogs =</span> <span class="fu">type_boolean</span>(<span class="st">&quot;Is the dog recommended for a home with other dogs?&quot;</span>),</span>
+<span id="cb39-6"><a href></a>  <span class="at">age =</span> <span class="fu">type_enum</span>(age_groups, <span class="st">&quot;Age group of the dog&quot;</span>)</span>
+<span id="cb39-7"><a href></a>)</span>
+<span id="cb39-8"><a href></a></span>
+<span id="cb39-9"><a href></a>chat <span class="ot">&lt;-</span> <span class="fu">chat_openrouter</span>(<span class="at">model =</span> <span class="st">&quot;anthropic/claude-haiku-5.5&quot;</span>)</span>
+<span id="cb39-10"><a href></a>chat<span class="sc">$</span><span class="fu">chat_structured</span>(dog_description, <span class="at">type =</span> dog_spec)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
 <section id="combining-multiple-fields---output" class="slide level2">
@@ -3033,18 +3111,18 @@ $age
 <section id="processing-multiple-dogs" class="slide level2">
 <h2>Processing multiple dogs</h2>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb36"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href></a>prompts <span class="ot">&lt;-</span> <span class="fu">paste</span>(</span>
-<span id="cb36-2"><a href></a>  <span class="st">&quot;Extract data from this dog adoption listing:&quot;</span>,</span>
-<span id="cb36-3"><a href></a>  dogs<span class="sc">$</span>description</span>
-<span id="cb36-4"><a href></a>)</span>
-<span id="cb36-5"><a href></a></span>
-<span id="cb36-6"><a href></a>output <span class="ot">&lt;-</span> <span class="fu">parallel_chat_structured</span>(</span>
-<span id="cb36-7"><a href></a>  <span class="at">chat =</span> <span class="fu">chat_openrouter</span>(<span class="at">model =</span> <span class="st">&quot;openai/gpt-6.1-terra&quot;</span>),</span>
-<span id="cb36-8"><a href></a>  <span class="at">prompts =</span> <span class="fu">as.list</span>(prompts),</span>
-<span id="cb36-9"><a href></a>  <span class="at">type =</span> dog_spec</span>
-<span id="cb36-10"><a href></a>)</span>
-<span id="cb36-11"><a href></a></span>
-<span id="cb36-12"><a href></a>output</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb41"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href></a>prompts <span class="ot">&lt;-</span> <span class="fu">paste</span>(</span>
+<span id="cb41-2"><a href></a>  <span class="st">&quot;Extract data from this dog adoption listing:&quot;</span>,</span>
+<span id="cb41-3"><a href></a>  dogs<span class="sc">$</span>description</span>
+<span id="cb41-4"><a href></a>)</span>
+<span id="cb41-5"><a href></a></span>
+<span id="cb41-6"><a href></a>output <span class="ot">&lt;-</span> <span class="fu">parallel_chat_structured</span>(</span>
+<span id="cb41-7"><a href></a>  <span class="at">chat =</span> <span class="fu">chat_openrouter</span>(<span class="at">model =</span> <span class="st">&quot;anthropic/claude-haiku-5.5&quot;</span>),</span>
+<span id="cb41-8"><a href></a>  <span class="at">prompts =</span> <span class="fu">as.list</span>(prompts),</span>
+<span id="cb41-9"><a href></a>  <span class="at">type =</span> dog_spec</span>
+<span id="cb41-10"><a href></a>)</span>
+<span id="cb41-11"><a href></a></span>
+<span id="cb41-12"><a href></a>output</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
 <section id="processing-multiple-dogs---output" class="slide level2 smaller">
@@ -3072,10 +3150,10 @@ $age
 <li><code>required = FALSE</code> lets the model return <code>NULL</code> instead of guessing</li>
 </ul>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb38"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href></a>breed_type <span class="ot">&lt;-</span> <span class="fu">type_string</span>(<span class="st">&quot;Breed of the dog&quot;</span>, <span class="at">required =</span> <span class="cn">FALSE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb43"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href></a>breed_type <span class="ot">&lt;-</span> <span class="fu">type_string</span>(<span class="st">&quot;Breed of the dog&quot;</span>, <span class="at">required =</span> <span class="cn">FALSE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <aside class="notes">
-<p>Reduce hallucination with optional fields. Note: at time of writing this errors with gpt-6.1-terra via OpenRouter, works with Gemini.</p>
+<p>Reduce hallucination with optional fields. Note: at time of writing this errored with OpenAI models via OpenRouter, worked with Gemini - check it works with Haiku.</p>
 <style type="text/css">
 span.MJX_Assistive_MathML {
 position:absolute!important;
@@ -3091,10 +3169,10 @@ display:block!important;
 <section id="making-things-up" class="slide level2">
 <h2>Making things up</h2>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb39"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href></a>owner_type <span class="ot">&lt;-</span> <span class="fu">type_string</span>(<span class="st">&quot;The surname of the dog&#39;s previous owner&quot;</span>)</span>
-<span id="cb39-2"><a href></a></span>
-<span id="cb39-3"><a href></a>chat <span class="ot">&lt;-</span> <span class="fu">chat_openrouter</span>(<span class="at">model =</span> <span class="st">&quot;openai/gpt-6.1-terra&quot;</span>)</span>
-<span id="cb39-4"><a href></a>chat<span class="sc">$</span><span class="fu">chat_structured</span>(dog_description, <span class="at">type =</span> owner_type)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb44"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href></a>owner_type <span class="ot">&lt;-</span> <span class="fu">type_string</span>(<span class="st">&quot;The surname of the dog&#39;s previous owner&quot;</span>)</span>
+<span id="cb44-2"><a href></a></span>
+<span id="cb44-3"><a href></a>chat <span class="ot">&lt;-</span> <span class="fu">chat_openrouter</span>(<span class="at">model =</span> <span class="st">&quot;anthropic/claude-haiku-5.5&quot;</span>)</span>
+<span id="cb44-4"><a href></a>chat<span class="sc">$</span><span class="fu">chat_structured</span>(dog_description, <span class="at">type =</span> owner_type)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <pre><code>[1] &quot;Unknown&quot;</code></pre>
 <p>The description never mentions an owner, but a required string <em>must</em> contain something. Other models will happily invent a name!</p>
@@ -3102,8 +3180,8 @@ display:block!important;
 <section id="combining-them" class="slide level2">
 <h2>Combining them</h2>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb41"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href></a>dogs_details <span class="ot">&lt;-</span> <span class="fu">bind_cols</span>(dogs, output)</span>
-<span id="cb41-2"><a href></a>dogs_details</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb46"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href></a>dogs_details <span class="ot">&lt;-</span> <span class="fu">bind_cols</span>(dogs, output)</span>
+<span id="cb46-2"><a href></a>dogs_details</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <pre><code># A tibble: 20 × 9
          id contact_city contact_state description         name  breed
@@ -3117,10 +3195,10 @@ display:block!important;
 <section id="save-to-a-file" class="slide level2">
 <h2>Save to a file</h2>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb43"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href></a>readr<span class="sc">::</span><span class="fu">write_csv</span>(dogs_details, <span class="st">&quot;data/dogs_details.csv&quot;</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb48"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a href></a>readr<span class="sc">::</span><span class="fu">write_csv</span>(dogs_details, <span class="st">&quot;data/dogs_details.csv&quot;</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
-<section id="your-turn-2" class="slide level2">
+<section id="your-turn-4" class="slide level2">
 <h2>Your turn</h2>
 <ol type="1">
 <li>Pick a different dog from the dataset</li>
@@ -3130,7 +3208,7 @@ display:block!important;
 </ol>
 <div class="cell">
 <div class="cell-output-display">
-<countdown-timer class="countdown" id="timer_0993cb63" minutes="15" seconds="0" update-every="1" tabindex="0" style="right:0;bottom:0;"></countdown-timer>
+<countdown-timer class="countdown" id="timer_b826bb63" minutes="15" seconds="0" update-every="1" tabindex="0" style="right:0;bottom:0;"></countdown-timer>
 </div>
 </div>
 </section></section>
@@ -3182,8 +3260,8 @@ display:block!important;
 <h2>Server-side: web search</h2>
 <p>Without search, the model only knows what it learned in training…</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb44"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href></a>chat <span class="ot">&lt;-</span> <span class="fu">chat_openrouter</span>(<span class="at">model =</span> <span class="st">&quot;openai/gpt-6.1-terra&quot;</span>)</span>
-<span id="cb44-2"><a href></a>chat<span class="sc">$</span><span class="fu">chat</span>(<span class="st">&quot;Which dog breeds are most popular this year?&quot;</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb49"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb49-1"><a href></a>chat <span class="ot">&lt;-</span> <span class="fu">chat_openrouter</span>(<span class="at">model =</span> <span class="st">&quot;anthropic/claude-haiku-5.5&quot;</span>)</span>
+<span id="cb49-2"><a href></a>chat<span class="sc">$</span><span class="fu">chat</span>(<span class="st">&quot;Which dog breeds are most popular this year?&quot;</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <pre><code>I can&#39;t verify this year&#39;s rankings, but the American Kennel Club&#39;s
 **2024 U.S. registration rankings** placed these breeds in the top
@@ -3196,8 +3274,8 @@ five:
 <section id="server-side-web-search-with-online" class="slide level2 smaller">
 <h2>Server-side: web search with <code>:online</code></h2>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb46"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href></a>chat <span class="ot">&lt;-</span> <span class="fu">chat_openrouter</span>(<span class="at">model =</span> <span class="st">&quot;openai/gpt-6.1-terra:online&quot;</span>)</span>
-<span id="cb46-2"><a href></a>chat<span class="sc">$</span><span class="fu">chat</span>(<span class="st">&quot;Which dog breeds are most popular this year?&quot;</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb51"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb51-1"><a href></a>chat <span class="ot">&lt;-</span> <span class="fu">chat_openrouter</span>(<span class="at">model =</span> <span class="st">&quot;anthropic/claude-haiku-5.5:online&quot;</span>)</span>
+<span id="cb51-2"><a href></a>chat<span class="sc">$</span><span class="fu">chat</span>(<span class="st">&quot;Which dog breeds are most popular this year?&quot;</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <pre><code>In the United States, the **French Bulldog** tops the latest American
 Kennel Club ranking, released in 2026 and based on 2025
@@ -3234,25 +3312,25 @@ registrations:
 <section id="without-a-tool-the-model-has-to-guess" class="slide level2">
 <h2>Without a tool the model has to guess…</h2>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb48"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a href></a>chat <span class="ot">&lt;-</span> <span class="fu">chat_openrouter</span>(<span class="at">model =</span> <span class="st">&quot;openai/gpt-6.1-terra&quot;</span>)</span>
-<span id="cb48-2"><a href></a>chat<span class="sc">$</span><span class="fu">chat</span>(<span class="st">&quot;what date is it right now?&quot;</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb53"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb53-1"><a href></a>chat <span class="ot">&lt;-</span> <span class="fu">chat_openrouter</span>(<span class="at">model =</span> <span class="st">&quot;anthropic/claude-haiku-5.5&quot;</span>)</span>
+<span id="cb53-2"><a href></a>chat<span class="sc">$</span><span class="fu">chat</span>(<span class="st">&quot;what date is it right now?&quot;</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <pre><code>Today is March 2, 2026.</code></pre>
 </section>
 <section id="whats-the-time" class="slide level2">
 <h2>What’s the time?</h2>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb50"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a href></a><span class="co"># Define the function</span></span>
-<span id="cb50-2"><a href></a>get_time <span class="ot">&lt;-</span> <span class="cf">function</span>() {</span>
-<span id="cb50-3"><a href></a>  <span class="fu">format</span>(<span class="fu">Sys.time</span>(), <span class="st">&quot;%A %d %B %Y, %H:%M&quot;</span>)</span>
-<span id="cb50-4"><a href></a>}</span>
-<span id="cb50-5"><a href></a></span>
-<span id="cb50-6"><a href></a><span class="co"># Create tool</span></span>
-<span id="cb50-7"><a href></a>time_tool <span class="ot">&lt;-</span> <span class="fu">tool</span>(get_time, <span class="st">&quot;Get the current date and time&quot;</span>)</span>
-<span id="cb50-8"><a href></a></span>
-<span id="cb50-9"><a href></a><span class="co"># Register the tool with the chat</span></span>
-<span id="cb50-10"><a href></a>chat<span class="sc">$</span><span class="fu">register_tool</span>(time_tool)</span>
-<span id="cb50-11"><a href></a>chat<span class="sc">$</span><span class="fu">chat</span>(<span class="st">&quot;what date is it right now?&quot;</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb55"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb55-1"><a href></a><span class="co"># Define the function</span></span>
+<span id="cb55-2"><a href></a>get_time <span class="ot">&lt;-</span> <span class="cf">function</span>() {</span>
+<span id="cb55-3"><a href></a>  <span class="fu">format</span>(<span class="fu">Sys.time</span>(), <span class="st">&quot;%A %d %B %Y, %H:%M&quot;</span>)</span>
+<span id="cb55-4"><a href></a>}</span>
+<span id="cb55-5"><a href></a></span>
+<span id="cb55-6"><a href></a><span class="co"># Create tool</span></span>
+<span id="cb55-7"><a href></a>time_tool <span class="ot">&lt;-</span> <span class="fu">tool</span>(get_time, <span class="st">&quot;Get the current date and time&quot;</span>)</span>
+<span id="cb55-8"><a href></a></span>
+<span id="cb55-9"><a href></a><span class="co"># Register the tool with the chat</span></span>
+<span id="cb55-10"><a href></a>chat<span class="sc">$</span><span class="fu">register_tool</span>(time_tool)</span>
+<span id="cb55-11"><a href></a>chat<span class="sc">$</span><span class="fu">chat</span>(<span class="st">&quot;what date is it right now?&quot;</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <pre><code>◯ [tool call] get_time()
 ● #&gt; Saturday 07 November 2026, 15:00
@@ -3261,9 +3339,9 @@ Today is November 7, 2026.</code></pre>
 <section id="the-tool-call-is-part-of-the-conversation" class="slide level2 smaller">
 <h2>The tool call is part of the conversation</h2>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb52"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb52-1"><a href></a>chat</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb57"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb57-1"><a href></a>chat</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<pre><code>&lt;Chat OpenRouter/openai/gpt-6.1-terra turns=6 input=192 output=90&gt;
+<pre><code>&lt;Chat OpenRouter/anthropic/claude-haiku-5.5 turns=6 input=192 output=90&gt;
 ── user ────────────────────────────────────────────────────
 what date is it right now?
 ── assistant [input=13 output=49] ──────────────────────────
@@ -3281,18 +3359,18 @@ Today is November 7, 2026.</code></pre>
 <h2>Giving the model our dog database</h2>
 <p>We don’t always need a tool - sometimes we can just send the data</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb54"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb54-1"><a href></a>prompt <span class="ot">&lt;-</span> <span class="st">&quot;You are a dog adoption assistant helping the user choose a dog</span></span>
-<span id="cb54-2"><a href></a><span class="st">from the listings they give you.&quot;</span></span>
-<span id="cb54-3"><a href></a></span>
-<span id="cb54-4"><a href></a>chat <span class="ot">&lt;-</span> <span class="fu">chat_openrouter</span>(</span>
-<span id="cb54-5"><a href></a>  <span class="at">model =</span> <span class="st">&quot;openai/gpt-6.1-terra&quot;</span>,</span>
-<span id="cb54-6"><a href></a>  <span class="at">system_prompt =</span> prompt</span>
-<span id="cb54-7"><a href></a>)</span>
-<span id="cb54-8"><a href></a></span>
-<span id="cb54-9"><a href></a>chat<span class="sc">$</span><span class="fu">chat</span>(</span>
-<span id="cb54-10"><a href></a>  <span class="st">&quot;Here are the dogs available:&quot;</span>,</span>
-<span id="cb54-11"><a href></a>  <span class="fu">content_document_file</span>(<span class="st">&quot;data/dogs_details.csv&quot;</span>)</span>
-<span id="cb54-12"><a href></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb59"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb59-1"><a href></a>prompt <span class="ot">&lt;-</span> <span class="st">&quot;You are a dog adoption assistant helping the user choose a dog</span></span>
+<span id="cb59-2"><a href></a><span class="st">from the listings they give you.&quot;</span></span>
+<span id="cb59-3"><a href></a></span>
+<span id="cb59-4"><a href></a>chat <span class="ot">&lt;-</span> <span class="fu">chat_openrouter</span>(</span>
+<span id="cb59-5"><a href></a>  <span class="at">model =</span> <span class="st">&quot;anthropic/claude-haiku-5.5&quot;</span>,</span>
+<span id="cb59-6"><a href></a>  <span class="at">system_prompt =</span> prompt</span>
+<span id="cb59-7"><a href></a>)</span>
+<span id="cb59-8"><a href></a></span>
+<span id="cb59-9"><a href></a>chat<span class="sc">$</span><span class="fu">chat</span>(</span>
+<span id="cb59-10"><a href></a>  <span class="st">&quot;Here are the dogs available:&quot;</span>,</span>
+<span id="cb59-11"><a href></a>  <span class="fu">content_document_file</span>(<span class="st">&quot;data/dogs_details.csv&quot;</span>)</span>
+<span id="cb59-12"><a href></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <pre><code>I&#39;ve got the listings! What are you looking for in a dog? It would
 help to know:
@@ -3304,7 +3382,7 @@ help to know:
 <section id="ask-for-a-recommendation" class="slide level2 smaller">
 <h2>Ask for a recommendation</h2>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb56"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb56-1"><a href></a>chat<span class="sc">$</span><span class="fu">chat</span>(<span class="st">&quot;I live in a small flat and already have a dog. Which three would suit me?&quot;</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb61"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb61-1"><a href></a>chat<span class="sc">$</span><span class="fu">chat</span>(<span class="st">&quot;I live in a small flat and already have a dog. Which three would suit me?&quot;</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <pre><code>Based on their size and reported friendliness with other dogs, these
 three look like promising matches:
@@ -3323,35 +3401,35 @@ specified, so those are worth asking about.
 <h2>A tool that changes things</h2>
 <p>Save a shortlist to a file - this time the tool takes arguments the model has to supply</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb58"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb58-1"><a href></a><span class="co"># Define the function - note it returns a string describing what it did</span></span>
-<span id="cb58-2"><a href></a>save_shortlist <span class="ot">&lt;-</span> <span class="cf">function</span>(names, path) {</span>
-<span id="cb58-3"><a href></a>  <span class="fu">writeLines</span>(names, path)</span>
-<span id="cb58-4"><a href></a>  <span class="fu">paste</span>(<span class="st">&quot;Saved&quot;</span>, <span class="fu">length</span>(names), <span class="st">&quot;dogs to&quot;</span>, path)</span>
-<span id="cb58-5"><a href></a>}</span>
-<span id="cb58-6"><a href></a></span>
-<span id="cb58-7"><a href></a><span class="co"># Create tool</span></span>
-<span id="cb58-8"><a href></a>save_shortlist_tool <span class="ot">&lt;-</span> <span class="fu">tool</span>(</span>
-<span id="cb58-9"><a href></a>  save_shortlist,</span>
-<span id="cb58-10"><a href></a>  <span class="st">&quot;Save a shortlist of dog names to a text file&quot;</span>,</span>
-<span id="cb58-11"><a href></a>  <span class="at">arguments =</span> <span class="fu">list</span>(</span>
-<span id="cb58-12"><a href></a>    <span class="at">names =</span> <span class="fu">type_array</span>(<span class="fu">type_string</span>(<span class="st">&quot;Dog names&quot;</span>)),</span>
-<span id="cb58-13"><a href></a>    <span class="at">path =</span> <span class="fu">type_string</span>(<span class="st">&quot;File path to save to&quot;</span>)</span>
-<span id="cb58-14"><a href></a>  )</span>
-<span id="cb58-15"><a href></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb63"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb63-1"><a href></a><span class="co"># Define the function - note it returns a string describing what it did</span></span>
+<span id="cb63-2"><a href></a>save_shortlist <span class="ot">&lt;-</span> <span class="cf">function</span>(names, path) {</span>
+<span id="cb63-3"><a href></a>  <span class="fu">writeLines</span>(names, path)</span>
+<span id="cb63-4"><a href></a>  <span class="fu">paste</span>(<span class="st">&quot;Saved&quot;</span>, <span class="fu">length</span>(names), <span class="st">&quot;dogs to&quot;</span>, path)</span>
+<span id="cb63-5"><a href></a>}</span>
+<span id="cb63-6"><a href></a></span>
+<span id="cb63-7"><a href></a><span class="co"># Create tool</span></span>
+<span id="cb63-8"><a href></a>save_shortlist_tool <span class="ot">&lt;-</span> <span class="fu">tool</span>(</span>
+<span id="cb63-9"><a href></a>  save_shortlist,</span>
+<span id="cb63-10"><a href></a>  <span class="st">&quot;Save a shortlist of dog names to a text file&quot;</span>,</span>
+<span id="cb63-11"><a href></a>  <span class="at">arguments =</span> <span class="fu">list</span>(</span>
+<span id="cb63-12"><a href></a>    <span class="at">names =</span> <span class="fu">type_array</span>(<span class="fu">type_string</span>(<span class="st">&quot;Dog names&quot;</span>)),</span>
+<span id="cb63-13"><a href></a>    <span class="at">path =</span> <span class="fu">type_string</span>(<span class="st">&quot;File path to save to&quot;</span>)</span>
+<span id="cb63-14"><a href></a>  )</span>
+<span id="cb63-15"><a href></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
 <section id="save-the-shortlist" class="slide level2">
 <h2>Save the shortlist</h2>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb59"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb59-1"><a href></a>chat<span class="sc">$</span><span class="fu">register_tool</span>(save_shortlist_tool)</span>
-<span id="cb59-2"><a href></a>chat<span class="sc">$</span><span class="fu">chat</span>(<span class="st">&quot;Save those three to shortlist.txt&quot;</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb64"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb64-1"><a href></a>chat<span class="sc">$</span><span class="fu">register_tool</span>(save_shortlist_tool)</span>
+<span id="cb64-2"><a href></a>chat<span class="sc">$</span><span class="fu">chat</span>(<span class="st">&quot;Save those three to shortlist.txt&quot;</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <pre><code>◯ [tool call] save_shortlist(names = c(&quot;Trixie&quot;, &quot;Gypsy Girl&quot;,
 &quot;Pippin&quot;), path = &quot;shortlist.txt&quot;)
 ● #&gt; Saved 3 dogs to shortlist.txt
 Saved Trixie, Gypsy Girl, and Pippin to `shortlist.txt`.</code></pre>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb61"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb61-1"><a href></a><span class="fu">readLines</span>(<span class="st">&quot;shortlist.txt&quot;</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb66"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb66-1"><a href></a><span class="fu">readLines</span>(<span class="st">&quot;shortlist.txt&quot;</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <pre><code>[1] &quot;Trixie&quot;     &quot;Gypsy Girl&quot; &quot;Pippin&quot;</code></pre>
 </section>
@@ -3398,55 +3476,55 @@ Saved Trixie, Gypsy Girl, and Pippin to `shortlist.txt`.</code></pre>
 <p>Checking the time just <em>reads</em> something. Saving a file <em>changes</em> something.</p>
 <p>Annotations let us describe what each tool does:</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb63" data-code-line-numbers="4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb63-1"><a href></a>time_tool <span class="ot">&lt;-</span> <span class="fu">tool</span>(</span>
-<span id="cb63-2"><a href></a>  get_time,</span>
-<span id="cb63-3"><a href></a>  <span class="st">&quot;Get the current date and time&quot;</span>,</span>
-<span id="cb63-4"><a href></a>  <span class="at">annotations =</span> <span class="fu">tool_annotations</span>(<span class="at">read_only_hint =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb63-5"><a href></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb68" data-code-line-numbers="4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb68-1"><a href></a>time_tool <span class="ot">&lt;-</span> <span class="fu">tool</span>(</span>
+<span id="cb68-2"><a href></a>  get_time,</span>
+<span id="cb68-3"><a href></a>  <span class="st">&quot;Get the current date and time&quot;</span>,</span>
+<span id="cb68-4"><a href></a>  <span class="at">annotations =</span> <span class="fu">tool_annotations</span>(<span class="at">read_only_hint =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb68-5"><a href></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
 <section id="should-the-model-be-allowed-to-do-that-1" class="slide level2">
 <h2>Should the model be allowed to do that?</h2>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb64" data-code-line-numbers="8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb64-1"><a href></a>save_shortlist_tool <span class="ot">&lt;-</span> <span class="fu">tool</span>(</span>
-<span id="cb64-2"><a href></a>  save_shortlist,</span>
-<span id="cb64-3"><a href></a>  <span class="st">&quot;Save a shortlist of dog names to a text file&quot;</span>,</span>
-<span id="cb64-4"><a href></a>  <span class="at">arguments =</span> <span class="fu">list</span>(</span>
-<span id="cb64-5"><a href></a>    <span class="at">names =</span> <span class="fu">type_array</span>(<span class="fu">type_string</span>(<span class="st">&quot;Dog names&quot;</span>)),</span>
-<span id="cb64-6"><a href></a>    <span class="at">path =</span> <span class="fu">type_string</span>(<span class="st">&quot;File path to save to&quot;</span>)</span>
-<span id="cb64-7"><a href></a>  ),</span>
-<span id="cb64-8"><a href></a>  <span class="at">annotations =</span> <span class="fu">tool_annotations</span>(<span class="at">read_only_hint =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb64-9"><a href></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb69" data-code-line-numbers="8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb69-1"><a href></a>save_shortlist_tool <span class="ot">&lt;-</span> <span class="fu">tool</span>(</span>
+<span id="cb69-2"><a href></a>  save_shortlist,</span>
+<span id="cb69-3"><a href></a>  <span class="st">&quot;Save a shortlist of dog names to a text file&quot;</span>,</span>
+<span id="cb69-4"><a href></a>  <span class="at">arguments =</span> <span class="fu">list</span>(</span>
+<span id="cb69-5"><a href></a>    <span class="at">names =</span> <span class="fu">type_array</span>(<span class="fu">type_string</span>(<span class="st">&quot;Dog names&quot;</span>)),</span>
+<span id="cb69-6"><a href></a>    <span class="at">path =</span> <span class="fu">type_string</span>(<span class="st">&quot;File path to save to&quot;</span>)</span>
+<span id="cb69-7"><a href></a>  ),</span>
+<span id="cb69-8"><a href></a>  <span class="at">annotations =</span> <span class="fu">tool_annotations</span>(<span class="at">read_only_hint =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb69-9"><a href></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
 <section id="asking-the-user-first" class="slide level2 smaller">
 <h2>Asking the user first</h2>
 <p><code>on_tool_request()</code> runs before every tool call. Return nothing to allow it, or call <code>tool_reject()</code> to block it.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb65"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb65-1"><a href></a>chat <span class="ot">&lt;-</span> <span class="fu">chat_openrouter</span>(<span class="at">model =</span> <span class="st">&quot;openai/gpt-6.1-terra&quot;</span>, <span class="at">system_prompt =</span> prompt)</span>
-<span id="cb65-2"><a href></a>chat<span class="sc">$</span><span class="fu">register_tool</span>(time_tool)</span>
-<span id="cb65-3"><a href></a>chat<span class="sc">$</span><span class="fu">register_tool</span>(save_shortlist_tool)</span>
-<span id="cb65-4"><a href></a></span>
-<span id="cb65-5"><a href></a>chat<span class="sc">$</span><span class="fu">on_tool_request</span>(<span class="cf">function</span>(request) {</span>
-<span id="cb65-6"><a href></a>  <span class="co"># Read-only tools go straight through</span></span>
-<span id="cb65-7"><a href></a>  <span class="cf">if</span> (<span class="fu">isTRUE</span>(request<span class="sc">@</span>tool<span class="sc">@</span>annotations<span class="sc">$</span>read_only_hint)) {</span>
-<span id="cb65-8"><a href></a>    <span class="fu">return</span>()</span>
-<span id="cb65-9"><a href></a>  }</span>
-<span id="cb65-10"><a href></a></span>
-<span id="cb65-11"><a href></a>  <span class="fu">cat</span>(<span class="st">&quot;The model wants to run&quot;</span>, request<span class="sc">@</span>name, <span class="st">&quot;with arguments:</span><span class="sc">\n</span><span class="st">&quot;</span>)</span>
-<span id="cb65-12"><a href></a>  <span class="fu">str</span>(request<span class="sc">@</span>arguments)</span>
-<span id="cb65-13"><a href></a></span>
-<span id="cb65-14"><a href></a>  answer <span class="ot">&lt;-</span> <span class="fu">readline</span>(<span class="st">&quot;Allow? (y/n) &quot;</span>)</span>
-<span id="cb65-15"><a href></a>  <span class="cf">if</span> (<span class="fu">tolower</span>(answer) <span class="sc">!=</span> <span class="st">&quot;y&quot;</span>) {</span>
-<span id="cb65-16"><a href></a>    <span class="fu">tool_reject</span>(<span class="st">&quot;The user did not approve this action&quot;</span>)</span>
-<span id="cb65-17"><a href></a>  }</span>
-<span id="cb65-18"><a href></a>})</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb70"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb70-1"><a href></a>chat <span class="ot">&lt;-</span> <span class="fu">chat_openrouter</span>(<span class="at">model =</span> <span class="st">&quot;anthropic/claude-haiku-5.5&quot;</span>, <span class="at">system_prompt =</span> prompt)</span>
+<span id="cb70-2"><a href></a>chat<span class="sc">$</span><span class="fu">register_tool</span>(time_tool)</span>
+<span id="cb70-3"><a href></a>chat<span class="sc">$</span><span class="fu">register_tool</span>(save_shortlist_tool)</span>
+<span id="cb70-4"><a href></a></span>
+<span id="cb70-5"><a href></a>chat<span class="sc">$</span><span class="fu">on_tool_request</span>(<span class="cf">function</span>(request) {</span>
+<span id="cb70-6"><a href></a>  <span class="co"># Read-only tools go straight through</span></span>
+<span id="cb70-7"><a href></a>  <span class="cf">if</span> (<span class="fu">isTRUE</span>(request<span class="sc">@</span>tool<span class="sc">@</span>annotations<span class="sc">$</span>read_only_hint)) {</span>
+<span id="cb70-8"><a href></a>    <span class="fu">return</span>()</span>
+<span id="cb70-9"><a href></a>  }</span>
+<span id="cb70-10"><a href></a></span>
+<span id="cb70-11"><a href></a>  <span class="fu">cat</span>(<span class="st">&quot;The model wants to run&quot;</span>, request<span class="sc">@</span>name, <span class="st">&quot;with arguments:</span><span class="sc">\n</span><span class="st">&quot;</span>)</span>
+<span id="cb70-12"><a href></a>  <span class="fu">str</span>(request<span class="sc">@</span>arguments)</span>
+<span id="cb70-13"><a href></a></span>
+<span id="cb70-14"><a href></a>  answer <span class="ot">&lt;-</span> <span class="fu">readline</span>(<span class="st">&quot;Allow? (y/n) &quot;</span>)</span>
+<span id="cb70-15"><a href></a>  <span class="cf">if</span> (<span class="fu">tolower</span>(answer) <span class="sc">!=</span> <span class="st">&quot;y&quot;</span>) {</span>
+<span id="cb70-16"><a href></a>    <span class="fu">tool_reject</span>(<span class="st">&quot;The user did not approve this action&quot;</span>)</span>
+<span id="cb70-17"><a href></a>  }</span>
+<span id="cb70-18"><a href></a>})</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
 <section id="saying-no" class="slide level2 smaller">
 <h2>Saying no</h2>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb66"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb66-1"><a href></a>chat<span class="sc">$</span><span class="fu">chat</span>(<span class="st">&quot;Pick two adult dogs and save them to adults.txt&quot;</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb71"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb71-1"><a href></a>chat<span class="sc">$</span><span class="fu">chat</span>(<span class="st">&quot;Pick two adult dogs and save them to adults.txt&quot;</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <pre><code>◯ [tool call] save_shortlist(names = c(&quot;Gypsy Girl&quot;, &quot;Lamb Chop&quot;),
 path = &quot;adults.txt&quot;)
@@ -3466,7 +3544,7 @@ approved.</code></pre>
 <section id="read-only-tools-dont-trigger-the-question" class="slide level2">
 <h2>Read-only tools don’t trigger the question</h2>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb68"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb68-1"><a href></a>chat<span class="sc">$</span><span class="fu">chat</span>(<span class="st">&quot;what time is it?&quot;</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb73"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb73-1"><a href></a>chat<span class="sc">$</span><span class="fu">chat</span>(<span class="st">&quot;what time is it?&quot;</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <pre><code>◯ [tool call] get_time()
 ● #&gt; Saturday 07 November 2026, 15:00
@@ -3475,10 +3553,10 @@ It&#39;s 3:00 PM on Saturday, November 7, 2026.</code></pre>
 <section id="try-it-live" class="slide level2">
 <h2>Try it live</h2>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb70"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb70-1"><a href></a><span class="fu">live_console</span>(chat)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb75"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb75-1"><a href></a><span class="fu">live_console</span>(chat)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
-<section id="your-turn-3" class="slide level2">
+<section id="your-turn-5" class="slide level2">
 <h2>Your turn</h2>
 <ol type="1">
 <li>Ask the assistant to save a different shortlist, and approve it this time</li>
@@ -3487,7 +3565,7 @@ It&#39;s 3:00 PM on Saturday, November 7, 2026.</code></pre>
 </ol>
 <div class="cell">
 <div class="cell-output-display">
-<countdown-timer class="countdown" id="timer_aea3f3a2" minutes="15" seconds="0" update-every="1" tabindex="0" style="right:0;bottom:0;"></countdown-timer>
+<countdown-timer class="countdown" id="timer_76ea23fa" minutes="15" seconds="0" update-every="1" tabindex="0" style="right:0;bottom:0;"></countdown-timer>
 </div>
 </div>
 </section></section>
@@ -3505,13 +3583,78 @@ It&#39;s 3:00 PM on Saturday, November 7, 2026.</code></pre>
 <li><a href="https://vitals.tidyverse.org/">{vitals}</a> - evaluating LLM output</li>
 </ul>
 </section>
-<section id="shinychat-chat-uis-in-shiny" class="slide level2">
+<section id="shinychat-chat-uis-in-shiny" class="slide level2 smaller">
 <h2>{shinychat}: chat UIs in Shiny</h2>
-<!-- TODO: placeholder - quick demo of shinychat -->
+<p>A <code>chat_ui()</code> in the UI; in the server, stream the reply into it whenever the user sends a message</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb76"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb76-1"><a href></a><span class="fu">library</span>(shiny)</span>
+<span id="cb76-2"><a href></a><span class="fu">library</span>(bslib)</span>
+<span id="cb76-3"><a href></a><span class="fu">library</span>(shinychat)</span>
+<span id="cb76-4"><a href></a></span>
+<span id="cb76-5"><a href></a>ui <span class="ot">&lt;-</span> <span class="fu">page_fillable</span>(</span>
+<span id="cb76-6"><a href></a>  <span class="fu">chat_ui</span>(<span class="st">&quot;chat&quot;</span>)</span>
+<span id="cb76-7"><a href></a>)</span>
+<span id="cb76-8"><a href></a></span>
+<span id="cb76-9"><a href></a>server <span class="ot">&lt;-</span> <span class="cf">function</span>(input, output, session) {</span>
+<span id="cb76-10"><a href></a>  chat <span class="ot">&lt;-</span> <span class="fu">chat_openrouter</span>(<span class="at">model =</span> <span class="st">&quot;anthropic/claude-haiku-5.5&quot;</span>)</span>
+<span id="cb76-11"><a href></a></span>
+<span id="cb76-12"><a href></a>  <span class="fu">observeEvent</span>(input<span class="sc">$</span>chat_user_input, {</span>
+<span id="cb76-13"><a href></a>    stream <span class="ot">&lt;-</span> chat<span class="sc">$</span><span class="fu">stream_async</span>(input<span class="sc">$</span>chat_user_input)</span>
+<span id="cb76-14"><a href></a>    <span class="fu">chat_append</span>(<span class="st">&quot;chat&quot;</span>, stream)</span>
+<span id="cb76-15"><a href></a>  })</span>
+<span id="cb76-16"><a href></a>}</span>
+<span id="cb76-17"><a href></a></span>
+<span id="cb76-18"><a href></a><span class="fu">shinyApp</span>(ui, server)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="shinychat-the-dog-assistant-as-an-app" class="slide level2 smaller">
+<h2>{shinychat}: the dog assistant as an app</h2>
+<p>Same ellmer chat object as section 4 - system prompt, dog listings, <code>save_shortlist</code> tool - shinychat just gives it a UI</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb77"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb77-1"><a href></a>server <span class="ot">&lt;-</span> <span class="cf">function</span>(input, output, session) {</span>
+<span id="cb77-2"><a href></a>  chat <span class="ot">&lt;-</span> <span class="fu">chat_openrouter</span>(</span>
+<span id="cb77-3"><a href></a>    <span class="at">model =</span> <span class="st">&quot;anthropic/claude-haiku-5.5&quot;</span>,</span>
+<span id="cb77-4"><a href></a>    <span class="at">system_prompt =</span> prompt</span>
+<span id="cb77-5"><a href></a>  )</span>
+<span id="cb77-6"><a href></a>  chat<span class="sc">$</span><span class="fu">register_tool</span>(save_shortlist_tool)</span>
+<span id="cb77-7"><a href></a></span>
+<span id="cb77-8"><a href></a>  <span class="fu">observeEvent</span>(input<span class="sc">$</span>chat_user_input, {</span>
+<span id="cb77-9"><a href></a>    stream <span class="ot">&lt;-</span> chat<span class="sc">$</span><span class="fu">stream_async</span>(input<span class="sc">$</span>chat_user_input)</span>
+<span id="cb77-10"><a href></a>    <span class="fu">chat_append</span>(<span class="st">&quot;chat&quot;</span>, stream)</span>
+<span id="cb77-11"><a href></a>  })</span>
+<span id="cb77-12"><a href></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Clickable suggestions in the welcome message:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb78"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb78-1"><a href></a><span class="fu">chat_ui</span>(<span class="st">&quot;chat&quot;</span>, <span class="at">greeting =</span> <span class="st">&#39;* &lt;span class=&quot;suggestion submit&quot;&gt;Which dogs would suit a small flat?&lt;/span&gt;&#39;</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
 </section>
 <section id="querychat-talk-to-your-data" class="slide level2">
 <h2>{querychat}: talk to your data</h2>
-<!-- TODO: placeholder - quick demo of querychat -->
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb79"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb79-1"><a href></a><span class="fu">library</span>(querychat)</span>
+<span id="cb79-2"><a href></a></span>
+<span id="cb79-3"><a href></a>dogs <span class="ot">&lt;-</span> readr<span class="sc">::</span><span class="fu">read_csv</span>(<span class="st">&quot;data/dogs_details.csv&quot;</span>)</span>
+<span id="cb79-4"><a href></a></span>
+<span id="cb79-5"><a href></a><span class="fu">querychat_app</span>(</span>
+<span id="cb79-6"><a href></a>  dogs,</span>
+<span id="cb79-7"><a href></a>  <span class="at">client =</span> <span class="fu">chat_openrouter</span>(<span class="at">model =</span> <span class="st">&quot;anthropic/claude-haiku-5.5&quot;</span>)</span>
+<span id="cb79-8"><a href></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<ul>
+<li>“Show me dogs that are good with other dogs”</li>
+<li>“What’s the average adoption fee by age?”</li>
+</ul>
+</section>
+<section id="querychat-how-it-works" class="slide level2">
+<h2>{querychat}: how it works</h2>
+<ul>
+<li>Your question is turned into <strong>SQL</strong> by the model</li>
+<li>The SQL runs on your data frame with <strong>DuckDB</strong> - you see the query</li>
+<li>Only the <strong>schema</strong> (column names, types, categories) is sent to the model, never the rows</li>
+<li>Read-only by design, and the SQL is reproducible</li>
+<li>Help it along with <code>data_description</code> and <code>greeting</code></li>
+</ul>
 </section>
 <section id="vitals-evaluating-llm-output" class="slide level2">
 <h2>{vitals}: evaluating LLM output</h2>
