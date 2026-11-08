@@ -452,22 +452,38 @@ If interested in Boris please fill out or adoption application so
 we can set up a meet and greet for you! ...
 ```
 
-## Without guidance, the model decides what matters
+## Switching model
+
+We're about to ask for something a bit more involved, so we'll move up to **Sonnet** - more capable than Haiku, about 20x the price per token (still fractions of a cent per call)
 
 ```{r}
-chat <- chat_openrouter(model = "anthropic/claude-haiku-5.5")
+chat <- chat_openrouter(model = "anthropic/claude-sonnet-5.5")
+```
+
+## Without guidance, the model decides what matters {.smaller}
+
+```{r}
 chat$chat("Summarise this dog:", dog_description)
 ```
 
 ```
-Boris is a 4-year-old mini schnauzer weighing just under 10 pounds.
-He loves rope toys and running around the yard. He has special
-needs, including B-12 shots every other week and a prescription
-vegan diet.
+**Boris** is a 4-year-old mini schnauzer who weighs just under 10
+pounds. He traveled from Arkansas in April 2019 and is now in foster
+care. He loves rope toys and running around his foster mom's yard.
 
-His adoption fee is $300. Apply at
-http://www.aohrescue.org/dog-adoption-application.
+**Special needs:**
+- He needs vitamin B-12 shots every other week, though the schedule
+  may change.
+- He eats a prescription vegan diet with no meat or protein.
+
+**Adoption details:**
+- The adoption fee is $300.
+- Interested adopters should fill out the application at
+  http://www.aohrescue.org/dog-adoption-application.
+- After that, a meet and greet can be arranged. ...
 ```
+
+Long, and it decided the application URL mattered
 
 ## System prompt
 
@@ -475,6 +491,86 @@ http://www.aohrescue.org/dog-adoption-application.
 - Set once, persists afterwards
 
 ## Setting the system prompt
+
+```{r}
+prompt <- "Give me a few bullet points to describe this dog's name,
+what it's like, age, and preferences"
+
+chat <- chat_openrouter(
+  model = "anthropic/claude-sonnet-5.5",
+  system_prompt = prompt
+)
+chat$chat("Summarise this dog:", dog_description)
+```
+
+```
+**Boris: Dog Summary**
+
+- **Name and breed:** Boris is a handsome miniature schnauzer who
+  traveled from Arkansas in April 2019.
+- **Age and size:** He is 4 years old and weighs just under 10 pounds.
+- **Personality and preferences:** He loves rope toys and running
+  around his foster mom's yard.
+- **Special needs:** He needs vitamin B-12 shots every other week ...
+- **Adoption details:** The fee is $300. ...
+```
+
+## Same conversation, more dogs {.smaller}
+
+```{r}
+chat$chat("Summarise this dog:", dogs$description[2])
+chat$chat("Summarise this dog:", dogs$description[3])
+```
+
+```
+**Duke: Dog Summary**
+
+- **Name and breed:** Duke is a Potcake from Abaco in the Bahamas.
+- **Age:** He is almost 2 years old.
+- **Personality:** He is a happy, goofy boy and a bit of a prankster.
+- **Preferences:** He loves toys, bones, getting affection, riding in
+  the car, snuggling on the couch, ...
+```
+
+```
+**Zac Woof-ron: Dog Summary**
+
+- **Name and breed:** Zac Woof-ron is a purebred red heeler
+  (Australian Cattle Dog) male located in Adamstown, MD.
+- **Age and size:** He is 2 years old and about 37 pounds.
+- **Background:** He was tied outside for much of his early life ...
+```
+
+Within a conversation the format stays consistent - the earlier answers are in the context
+
+## ...but start a new conversation {.smaller}
+
+```{r}
+chat <- chat_openrouter(
+  model = "anthropic/claude-sonnet-5.5",
+  system_prompt = prompt
+)
+chat$chat("Summarise this dog:", dogs$description[3])
+```
+
+```
+**Zac Woof-ron: Dog Summary**
+
+- **Name:** Zac Woof-ron, a playful "movie star" nickname. He is a
+  neutered male red heeler (Australian Cattle Dog) ...
+
+- **Age and size:** 2 years old, about 37 lbs, purebred, and high energy.
+
+- **Personality:**
+  - Slow to warm up to new people, but then becomes devoted ...
+  - Wants to be with his person at all times.
+  - Smart, highly food motivated, and easy to train.
+  ...
+```
+
+Same dog, same prompt, different structure. LLMs are **non-deterministic**
+
+## A more specific system prompt
 
 ```{r}
 prompt <- "You are a dog adoption assistant helping people find dogs to adopt.
@@ -489,43 +585,39 @@ Age group: one of Baby, Young, Adult, Senior
 Likes and dislikes: what the dog does and doesn't enjoy"
 
 chat <- chat_openrouter(
-  model = "anthropic/claude-haiku-5.5",
+  model = "anthropic/claude-sonnet-5.5",
   system_prompt = prompt
 )
-chat$chat("Summarise this dog:", dog_description)
 ```
 
-## Setting the system prompt - output
-
-```
-Name: Boris
-Summary: Boris is a 4-year-old, under-10-pound mini schnauzer with
-special needs, including a prescription vegan diet and B-12 shots
-every other week.
-Age group: Adult
-Likes and dislikes: Loves rope toys and running around the yard;
-dislikes are not specified.
-```
-
-## Run it again though...responses vary {.smaller}
+## A more specific system prompt - output {.smaller}
 
 ```{r}
-chat <- chat_openrouter(
-  model = "anthropic/claude-haiku-5.5",
-  system_prompt = prompt
-)
-chat$chat("Summarise this dog:", dog_description)
+chat$chat("Summarise this dog:", dogs$description[1])
+chat$chat("Summarise this dog:", dogs$description[2])
+chat$chat("Summarise this dog:", dogs$description[3])
 ```
 
 ```
 Name: Boris
-Summary: Boris is a 4-year-old mini schnauzer under 10 pounds who
-needs prescription vegan food and B-12 shots every other week,
-subject to change.
+Summary: Boris is a handsome, special needs mini schnauzer who needs
+biweekly B-12 shots and a vegan prescription diet.
 Age group: Adult
-Likes and dislikes: Loves rope toys and running around the yard;
-dislikes are not stated.
+Likes and dislikes: Likes rope toys and running around his foster
+mom's yard. No stated dislikes, but he can't eat meat or protein.
 ```
+
+```
+Name: Duke
+Summary: Duke is a playful, goofy 2-year-old Potcake who is fully
+vetted and crate trained, but does best in a home without other dogs
+or kids.
+Age group: Young
+Likes and dislikes: Likes toys, bones, cuddling, car rides, kiddie
+pools, and fenced-yard play. Dislikes sharing his stuffed animals ...
+```
+
+A role, a clear task, and an output format: now the shape holds across dogs
 
 ## Prompt engineering
 
