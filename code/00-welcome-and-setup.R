@@ -20,5 +20,5 @@ Sys.getenv("OPENROUTER_API_KEY") != ""
 ## Check ellmer can talk to the provider
 
 library(ellmer)
-chat <- chat_openrouter(model = "openai/gpt-6.1-terra")
+chat <- chat_openrouter(model = "anthropic/claude-haiku-5.5")
 chat$chat("Say hello in one short sentence.")

@@ -24,7 +24,7 @@ dog_description
 
 ## Without guidance the LLM is chatty and inconsistent
 
-chat <- chat_openrouter(model = "openai/gpt-6.1-terra")
+chat <- chat_openrouter(model = "anthropic/claude-haiku-5.5")
 chat$chat("Summarise this dog:", dog_description)
 
 ## A system prompt sets the ground rules for the whole conversation
@@ -41,7 +41,7 @@ Age group: one of Baby, Young, Adult, Senior
 Likes and dislikes: what the dog does and doesn't enjoy"
 
 chat <- chat_openrouter(
-  model = "openai/gpt-6.1-terra",
+  model = "anthropic/claude-haiku-5.5",
   system_prompt = prompt
 )
 chat$chat("Summarise this dog:", dog_description)
@@ -49,7 +49,7 @@ chat$chat("Summarise this dog:", dog_description)
 ## Run it again - the format holds, but the wording still varies
 
 chat <- chat_openrouter(
-  model = "openai/gpt-6.1-terra",
+  model = "anthropic/claude-haiku-5.5",
   system_prompt = prompt
 )
 chat$chat("Summarise this dog:", dog_description)

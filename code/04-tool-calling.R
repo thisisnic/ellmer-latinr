@@ -18,11 +18,11 @@ library(dplyr)
 ## Server-side: web search with ":online"
 
 # Without search, the model only knows what it learned in training...
-chat <- chat_openrouter(model = "openai/gpt-6.1-terra")
+chat <- chat_openrouter(model = "anthropic/claude-haiku-5.5")
 chat$chat("Which dog breeds are most popular this year?")
 
 # ...with search, OpenRouter runs a web search before the model answers
-chat <- chat_openrouter(model = "openai/gpt-6.1-terra:online")
+chat <- chat_openrouter(model = "anthropic/claude-haiku-5.5:online")
 chat$chat("Which dog breeds are most popular this year?")
 
 # The search happened on the provider's side. There is no tool call for
@@ -40,7 +40,7 @@ get_time <- function() {
 time_tool <- tool(get_time, "Get the current date and time")
 
 # Without the tool the model has to guess...
-chat <- chat_openrouter(model = "openai/gpt-6.1-terra")
+chat <- chat_openrouter(model = "anthropic/claude-haiku-5.5")
 chat$chat("what date is it right now?")
 
 # ...with the tool it asks ellmer to run our function
@@ -57,7 +57,7 @@ prompt <- "You are a dog adoption assistant helping the user choose a dog
 from the listings they give you."
 
 chat <- chat_openrouter(
-  model = "openai/gpt-6.1-terra",
+  model = "anthropic/claude-haiku-5.5",
   system_prompt = prompt
 )
 
@@ -114,7 +114,7 @@ save_shortlist_tool <- tool(
 # ...and on_tool_request() runs before every tool call. Return nothing to
 # allow it, or call tool_reject() to block it.
 chat <- chat_openrouter(
-  model = "openai/gpt-6.1-terra",
+  model = "anthropic/claude-haiku-5.5",
   system_prompt = prompt
 )
 chat$register_tool(time_tool)

@@ -12,7 +12,7 @@ dog_description <- dogs |>
 
 ## The problem with unstructured output
 
-chat <- chat_openrouter(model = "openai/gpt-6.1-terra")
+chat <- chat_openrouter(model = "anthropic/claude-haiku-5.5")
 output <- chat$chat(
   "Extract the name and adoption fee from this data
 
@@ -29,14 +29,14 @@ class(output)
 
 name_type <- type_string("The name of the dog")
 
-chat <- chat_openrouter(model = "openai/gpt-6.1-terra")
+chat <- chat_openrouter(model = "anthropic/claude-haiku-5.5")
 chat$chat_structured(dog_description, type = name_type)
 
 ## Extracting a number
 
 fee_type <- type_number("Adoption fee in dollars")
 
-chat <- chat_openrouter(model = "openai/gpt-6.1-terra")
+chat <- chat_openrouter(model = "anthropic/claude-haiku-5.5")
 chat$chat_structured(dog_description, type = fee_type)
 
 ## Constraining to specific choices
@@ -45,7 +45,7 @@ age_groups <- c("Baby", "Young", "Adult", "Senior")
 
 age_type <- type_enum(age_groups, "Age group of the dog")
 
-chat <- chat_openrouter(model = "openai/gpt-6.1-terra")
+chat <- chat_openrouter(model = "anthropic/claude-haiku-5.5")
 chat$chat_structured(dog_description, type = age_type)
 
 ## Extracting a yes/no
@@ -54,14 +54,14 @@ other_dogs_type <- type_boolean(
   "Is the dog recommended for a home with other dogs?"
 )
 
-chat <- chat_openrouter(model = "openai/gpt-6.1-terra")
+chat <- chat_openrouter(model = "anthropic/claude-haiku-5.5")
 chat$chat_structured(dog_description, type = other_dogs_type)
 
 ## Extracting a list of values
 
 likes_type <- type_array(type_string("Things the dog likes"))
 
-chat <- chat_openrouter(model = "openai/gpt-6.1-terra")
+chat <- chat_openrouter(model = "anthropic/claude-haiku-5.5")
 chat$chat_structured(dog_description, type = likes_type)
 
 ## Combining multiple fields
@@ -76,7 +76,7 @@ dog_spec <- type_object(
   age = type_enum(age_groups, "Age group of the dog")
 )
 
-chat <- chat_openrouter(model = "openai/gpt-6.1-terra")
+chat <- chat_openrouter(model = "anthropic/claude-haiku-5.5")
 chat$chat_structured(dog_description, type = dog_spec)
 
 ## Processing multiple dogs
@@ -87,7 +87,7 @@ prompts
 
 # parallel_chat_structured is a little different
 output <- parallel_chat_structured(
-  chat = chat_openrouter(model = "openai/gpt-6.1-terra"),
+  chat = chat_openrouter(model = "anthropic/claude-haiku-5.5"),
   prompts = as.list(prompts),
   type = dog_spec
 )

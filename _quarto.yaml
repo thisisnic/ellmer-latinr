@@ -36,6 +36,8 @@ website:
             href: code/03-structured-data.qmd
           - text: "4: Tool Calling"
             href: code/04-tool-calling.qmd
+          - text: "5 (Bonus): Other Libraries for LLMs in R"
+            href: code/05-other-libraries.qmd
 
 format:
   html:

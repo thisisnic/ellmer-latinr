@@ -88,7 +88,7 @@ countdown::countdown(minutes = 3)
 ## Working on Posit Cloud
 
 - <https://posit.cloud/>
-- Or your own laptop, if you've done the prework
+- Or your own laptop
 
 ## Code/examples
 
@@ -108,8 +108,8 @@ countdown::countdown(minutes = 3)
 By the end of this section you'll be able to:
 
 - Set up an API key and connect to an LLM from R
-- Send messages and read the replies
 - Hold a multi-turn conversation, and understand why earlier messages affect later answers
+- See what a chat object contains, and how many tokens you're using
 - Start a fresh chat when you need to
 
 ## Setting up your API key
@@ -129,7 +129,7 @@ usethis::edit_r_environ()
 
 Save your API key at the bottom of the file like this:
 <br/><br/>
-```         
+```
 OPENROUTER_API_KEY=sk12345567890
 ```
 <br/>
@@ -168,13 +168,58 @@ Learn ellmer and the rest of the ecosystem opens up.
 
 ...and many more
 
+## Choosing a model
+
+Models differ on:
+
+- **Capability** - reasoning, coding, following complex instructions
+- **Speed** - small models answer in a second, big ones take longer
+- **Cost** - priced per token, and can vary 100x between models
+- **Context window** - how much text you can send at once
+- **Features** - vision, tool calling, structured output
+
+Start with a small, cheap model. Move up only if it isn't good enough.
+
 ## This workshop
 
 - OpenRouter - one API key, access to models from many providers
-- Models are named `provider/model`, e.g. `"openai/gpt-6.1-terra"`
+- Models are named `provider/model`, e.g. `"anthropic/claude-haiku-5.5"`
 
 ```{r}
-chat_openrouter(model = "openai/gpt-6.1-terra")
+chat_openrouter(model = "anthropic/claude-haiku-5.5")
+```
+
+## Starting a conversation
+
+```{r}
+library(ellmer)
+chat <- chat_openrouter(model = "anthropic/claude-haiku-5.5")
+```
+
+## Sending a message to the LLM
+
+```{r}
+chat$chat("What is the most popular dog breed in the world?
+  Answer succinctly.")
+```
+
+```
+The Labrador Retriever is generally considered the most popular dog
+breed in the world, based on registration statistics (such as the
+American Kennel Club's rankings), though exact global rankings vary
+by country and data source.
+```
+
+## Your turn
+
+1. Save your API key with `usethis::edit_r_environ()` and restart R
+2. Start a conversation: `chat <- chat_openrouter(model = "anthropic/claude-haiku-5.5")`
+3. Ask it a question with `chat$chat()` and check you get an answer back
+
+```{r}
+#| echo: false
+#| eval: true
+countdown::countdown(minutes = 10)
 ```
 
 ## {ellmer}: Conversations and Turns
@@ -198,80 +243,79 @@ Friendly, energetic, and food-motivated!
 :::
 ::::
 
-## Context
-
-- LLMs can't "remember" past conversation
-- every time you send a new message, entire conversation history sent with it
-- context - grows every turn
-- context window: how much you can send, measured in tokens
-
 ## Tokens
 
 -   Context window measured in tokens
 -   What is sent back and forth, and used to measure cost
 -   in English, 1 token is around 0.75 words
 
-## Starting a conversation
-
-```{r}
-library(ellmer)
-chat <- chat_openrouter(model = "openai/gpt-6.1-terra")
-```
-
-## Sending a message to the LLM
-
-```{r}
-chat$chat("What is the most popular dog breed in the world?
-  Answer succinctly.")
-```
-
-```
-The **Labrador Retriever** is widely considered the world's most
-popular dog breed, though there's no definitive global count.
-```
-
-## Turns
+## What's in the chat object? {.smaller}
 
 ```{r}
 chat
 ```
 
 ```
-<Chat OpenRouter/openai/gpt-6.1-terra turns=2 input=22 output=92>
+<Chat OpenRouter/anthropic/claude-haiku-5.5 turns=2 input=32 output=66>
 ── user ────────────────────────────────────────────────────
 What is the most popular dog breed in the world?
   Answer succinctly.
-── assistant [input=22 output=92] ──────────────────────────
-<thinking> ... </thinking>
-
-The **Labrador Retriever** is widely considered the world's most
-popular dog breed, though there's no definitive global count.
+── assistant [input=32 output=66] ──────────────────────────
+The Labrador Retriever is generally considered the most popular dog
+breed in the world, based on registration statistics (such as the
+American Kennel Club's rankings), though exact global rankings vary
+by country and data source.
 ```
+
+::: {.incremental}
+- **Provider and model** - `OpenRouter/anthropic/claude-haiku-5.5`
+- **Turns** - 2 so far: one **user** turn, one **assistant** turn
+- **Tokens** - 32 in, 66 out. Tokens are what you pay for
+:::
+
+## Counting tokens
+
+`token_usage()` totals every call made in this R session, across all chats:
+
+```{r}
+token_usage()
+```
+
+```
+    provider                      model input output cached_input price
+1 OpenRouter anthropic/claude-haiku-5.5    32     66            0    NA
+```
+
+Handy for keeping an eye on usage when you start looping over data. Price is `NA` here because OpenRouter doesn't report it - check your OpenRouter dashboard instead.
 
 ## Continuing the conversation
 
 ```{r}
-chat$chat("What are they like to live with?")
-chat$chat("How long do they usually live?")
+chat$chat("How long does this breed of dog usually live?")
 chat
 ```
 
 ```
-<Chat OpenRouter/openai/gpt-6.1-terra turns=6 input=236 output=183>
+<Chat OpenRouter/anthropic/claude-haiku-5.5 turns=4 input=145 output=101>
 ── user ────────────────────────────────────────────────────
 What is the most popular dog breed in the world? ...
-── assistant [input=22 output=92] ──────────────────────────
-The **Labrador Retriever** is widely considered ...
+── assistant [input=32 output=66] ──────────────────────────
+The Labrador Retriever is generally considered the most popular ...
 ── user ────────────────────────────────────────────────────
-What are they like to live with?
-── assistant [input=66 output=69] ──────────────────────────
-Labradors are generally friendly, affectionate, and eager to ...
-── user ────────────────────────────────────────────────────
-How long do they usually live?
-── assistant [input=148 output=22] ─────────────────────────
-Labrador Retrievers usually live **10–12 years**, though some
-live longer.
+How long does this breed of dog usually live?
+── assistant [input=113 output=35] ─────────────────────────
+Labrador Retrievers typically live about 10 to 12 years, though
+some live into their mid-teens.
 ```
+
+Notice the input tokens went up - and the model knew which breed we meant
+
+## Context
+
+- The model knew what "this breed" meant - but LLMs can't "remember" anything
+- Every time you send a message, ellmer sends the **entire conversation history** with it
+- That history is the **context**, and it grows every turn
+- The **context window** is how much you can send at once, measured in tokens
 
 ## Cumulative nature of tokens
 
@@ -288,14 +332,17 @@ Numbers don't match up perfectly - some things are cached
 ## Reset - just start a new chat
 
 ```{r}
-chat <- chat_openrouter(model = "openai/gpt-6.1-terra")
-chat$chat("What were we saying earlier?")
+chat <- chat_openrouter(model = "anthropic/claude-haiku-5.5")
+chat$chat("What is its favourite food?")
 ```
 
 ```
-I don't see any earlier messages in this conversation. What topic
-did you have in mind?
+I'm not sure what "its" refers to. Could you tell me which animal,
+character, or thing you mean? Once I know, I can tell you what's
+known about its favourite food...
 ```
+
+A new chat object has no history - the Labrador is gone
 
 ## Chatting interactively
 
@@ -310,15 +357,58 @@ Both carry on the same conversation - `chat` still has all the turns afterwards.
 
 ## Your turn
 
-1. Set up your API key using `usethis::edit_r_environ()` + restart R
-2. Start a conversation: `chat_openrouter(model = "openai/gpt-6.1-terra")`
-3. Paste one dog's description from `dogs.csv` and ask: *would this dog suit a flat with no garden?*
-4. Ask a follow-up question without repeating the description
+1. Start a new chat and open it with `live_browser(chat)`
+2. Ask a few questions, including a follow-up that relies on an earlier answer
+3. Close the browser window, then print `chat` - what do you see?
 
 ```{r}
 #| echo: false
 #| eval: true
 countdown::countdown(minutes = 10)
+```
+
+## Today's data: dog adoption listings
+
+```{r}
+library(readr)
+dogs <- read_csv("data/dogs.csv")
+View(dogs)
+```
+
+- One row per dog, from a US adoption site
+- The `description` column is free text written by the shelter - that's what we'll be working with
+
+## Giving the model something to work with
+
+`chat$chat()` takes any number of pieces of content and sends them together:
+
+```{r}
+boris <- dogs$description[1]
+
+chat <- chat_openrouter(model = "anthropic/claude-haiku-5.5")
+chat$chat("Give me a quick summary of this dog", boris)
+```
+
+```
+**Boris** is a 4-year-old mini schnauzer under 10 pounds who arrived
+from Arkansas in April 2019. He's handsome, loves rope toys, and
+enjoys running around his foster mom's yard. He has special needs:
+he requires vitamin B-12 shots every other week (this may change)
+and a prescription, no-meat, no-protein diet, described as vegan.
+
+The adoption fee is $300. ...
+```
+
+## Your turn
+
+1. Pick a different dog from `dogs` and pass its description to `chat$chat()`
+2. Ask: *would this dog suit a flat with no garden?*
+3. Ask a follow-up question without repeating the description
+
+```{r}
+#| echo: false
+#| eval: true
+countdown::countdown(minutes = 5)
 ```
 
 # 2 - Prompt Engineering
@@ -331,17 +421,14 @@ By the end of this section you'll be able to:
 - Write prompts with a clear role, task and output format
 - Understand why the same prompt still gives varying answers
 
-## Load the data to work with
+## Back to Boris
 
 ```{r}
 library(ellmer)
 library(dplyr)
 
 dogs <- readr::read_csv("data/dogs.csv")
-
-dog_description <- dogs |>
-  slice(1) |>
-  pull(description)
+dog_description <- dogs$description[1]
 
 dog_description
 ```
@@ -363,7 +450,7 @@ we can set up a meet and greet for you! ...
 ## Without guidance, the model decides what matters
 
 ```{r}
-chat <- chat_openrouter(model = "openai/gpt-6.1-terra")
+chat <- chat_openrouter(model = "anthropic/claude-haiku-5.5")
 chat$chat("Summarise this dog:", dog_description)
 ```
 
@@ -397,7 +484,7 @@ Age group: one of Baby, Young, Adult, Senior
 Likes and dislikes: what the dog does and doesn't enjoy"
 
 chat <- chat_openrouter(
-  model = "openai/gpt-6.1-terra",
+  model = "anthropic/claude-haiku-5.5",
   system_prompt = prompt
 )
 chat$chat("Summarise this dog:", dog_description)
@@ -419,7 +506,7 @@ dislikes are not specified.
 
 ```{r}
 chat <- chat_openrouter(
-  model = "openai/gpt-6.1-terra",
+  model = "anthropic/claude-haiku-5.5",
   system_prompt = prompt
 )
 chat$chat("Summarise this dog:", dog_description)
@@ -487,7 +574,7 @@ By the end of this section you'll be able to:
 ## The problem with unstructured output
 
 ```{r}
-chat <- chat_openrouter(model = "openai/gpt-6.1-terra")
+chat <- chat_openrouter(model = "anthropic/claude-haiku-5.5")
 output <- chat$chat(
   "Extract the name and adoption fee from this data
 
@@ -540,7 +627,7 @@ The format isn't guaranteed - hard to use programmatically!
 ```{r}
 name_type <- type_string("The name of the dog")
 
-chat <- chat_openrouter(model = "openai/gpt-6.1-terra")
+chat <- chat_openrouter(model = "anthropic/claude-haiku-5.5")
 chat$chat_structured(dog_description, type = name_type)
 ```
 
@@ -555,7 +642,7 @@ We get a plain string back - no "Name:" prefix to strip off!
 ```{r}
 fee_type <- type_number("Adoption fee in dollars")
 
-chat <- chat_openrouter(model = "openai/gpt-6.1-terra")
+chat <- chat_openrouter(model = "anthropic/claude-haiku-5.5")
 chat$chat_structured(dog_description, type = fee_type)
 ```
 
@@ -574,7 +661,7 @@ age_groups <- c("Baby", "Young", "Adult", "Senior")
 
 age_type <- type_enum(age_groups, "Age group of the dog")
 
-chat <- chat_openrouter(model = "openai/gpt-6.1-terra")
+chat <- chat_openrouter(model = "anthropic/claude-haiku-5.5")
 chat$chat_structured(dog_description, type = age_type)
 ```
 
@@ -591,7 +678,7 @@ other_dogs_type <- type_boolean(
   "Is the dog recommended for a home with other dogs?"
 )
 
-chat <- chat_openrouter(model = "openai/gpt-6.1-terra")
+chat <- chat_openrouter(model = "anthropic/claude-haiku-5.5")
 chat$chat_structured(dog_description, type = other_dogs_type)
 ```
 
@@ -604,7 +691,7 @@ chat$chat_structured(dog_description, type = other_dogs_type)
 ```{r}
 likes_type <- type_array(type_string("Things the dog likes"))
 
-chat <- chat_openrouter(model = "openai/gpt-6.1-terra")
+chat <- chat_openrouter(model = "anthropic/claude-haiku-5.5")
 chat$chat_structured(dog_description, type = likes_type)
 ```
 
@@ -626,7 +713,7 @@ dog_spec <- type_object(
   age = type_enum(age_groups, "Age group of the dog")
 )
 
-chat <- chat_openrouter(model = "openai/gpt-6.1-terra")
+chat <- chat_openrouter(model = "anthropic/claude-haiku-5.5")
 chat$chat_structured(dog_description, type = dog_spec)
 ```
 
@@ -667,7 +754,7 @@ prompts <- paste(
 )
 
 output <- parallel_chat_structured(
-  chat = chat_openrouter(model = "openai/gpt-6.1-terra"),
+  chat = chat_openrouter(model = "anthropic/claude-haiku-5.5"),
   prompts = as.list(prompts),
   type = dog_spec
 )
@@ -705,7 +792,7 @@ breed_type <- type_string("Breed of the dog", required = FALSE)
 ```
 
 ::: notes
-Reduce hallucination with optional fields. Note: at time of writing this errors with gpt-6.1-terra via OpenRouter, works with Gemini.
+Reduce hallucination with optional fields. Note: at time of writing this errored with OpenAI models via OpenRouter, worked with Gemini - check it works with Haiku.
 :::
 
 ## Making things up
@@ -713,7 +800,7 @@ Reduce hallucination with optional fields. Note: at time of writing this errors 
 ```{r}
 owner_type <- type_string("The surname of the dog's previous owner")
 
-chat <- chat_openrouter(model = "openai/gpt-6.1-terra")
+chat <- chat_openrouter(model = "anthropic/claude-haiku-5.5")
 chat$chat_structured(dog_description, type = owner_type)
 ```
 
@@ -800,7 +887,7 @@ By the end of this section you'll be able to:
 Without search, the model only knows what it learned in training...
 
 ```{r}
-chat <- chat_openrouter(model = "openai/gpt-6.1-terra")
+chat <- chat_openrouter(model = "anthropic/claude-haiku-5.5")
 chat$chat("Which dog breeds are most popular this year?")
 ```
 
@@ -817,7 +904,7 @@ five:
 ## Server-side: web search with `:online` {.smaller}
 
 ```{r}
-chat <- chat_openrouter(model = "openai/gpt-6.1-terra:online")
+chat <- chat_openrouter(model = "anthropic/claude-haiku-5.5:online")
 chat$chat("Which dog breeds are most popular this year?")
 ```
 
@@ -855,7 +942,7 @@ OpenRouter ran a web search before the model answered. No tool call for ellmer t
 ## Without a tool the model has to guess...
 
 ```{r}
-chat <- chat_openrouter(model = "openai/gpt-6.1-terra")
+chat <- chat_openrouter(model = "anthropic/claude-haiku-5.5")
 chat$chat("what date is it right now?")
 ```
 
@@ -892,7 +979,7 @@ chat
 ```
 
 ```
-<Chat OpenRouter/openai/gpt-6.1-terra turns=6 input=192 output=90>
+<Chat OpenRouter/anthropic/claude-haiku-5.5 turns=6 input=192 output=90>
 ── user ────────────────────────────────────────────────────
 what date is it right now?
 ── assistant [input=13 output=49] ──────────────────────────
@@ -916,7 +1003,7 @@ prompt <- "You are a dog adoption assistant helping the user choose a dog
 from the listings they give you."
 
 chat <- chat_openrouter(
-  model = "openai/gpt-6.1-terra",
+  model = "anthropic/claude-haiku-5.5",
   system_prompt = prompt
 )
 
@@ -1069,7 +1156,7 @@ save_shortlist_tool <- tool(
 `on_tool_request()` runs before every tool call. Return nothing to allow it, or call `tool_reject()` to block it.
 
 ```{r}
-chat <- chat_openrouter(model = "openai/gpt-6.1-terra", system_prompt = prompt)
+chat <- chat_openrouter(model = "anthropic/claude-haiku-5.5", system_prompt = prompt)
 chat$register_tool(time_tool)
 chat$register_tool(save_shortlist_tool)
 
@@ -1153,13 +1240,79 @@ If we have time, a quick look at three packages built on top of ellmer:
 - [{querychat}](https://posit-dev.github.io/querychat/) - ask questions of a data frame in plain language
 - [{vitals}](https://vitals.tidyverse.org/) - evaluating LLM output
 
-## {shinychat}: chat UIs in Shiny
+## {shinychat}: chat UIs in Shiny {.smaller}
 
-<!-- TODO: placeholder - quick demo of shinychat -->
+A `chat_ui()` in the UI; in the server, stream the reply into it whenever the user sends a message
+
+```{r}
+library(shiny)
+library(bslib)
+library(shinychat)
+
+ui <- page_fillable(
+  chat_ui("chat")
+)
+
+server <- function(input, output, session) {
+  chat <- chat_openrouter(model = "anthropic/claude-haiku-5.5")
+
+  observeEvent(input$chat_user_input, {
+    stream <- chat$stream_async(input$chat_user_input)
+    chat_append("chat", stream)
+  })
+}
+
+shinyApp(ui, server)
+```
+
+## {shinychat}: the dog assistant as an app {.smaller}
+
+Same ellmer chat object as section 4 - system prompt, dog listings, `save_shortlist` tool - shinychat just gives it a UI
+
+```{r}
+server <- function(input, output, session) {
+  chat <- chat_openrouter(
+    model = "anthropic/claude-haiku-5.5",
+    system_prompt = prompt
+  )
+  chat$register_tool(save_shortlist_tool)
+
+  observeEvent(input$chat_user_input, {
+    stream <- chat$stream_async(input$chat_user_input)
+    chat_append("chat", stream)
+  })
+}
+```
+
+Clickable suggestions in the welcome message:
+
+```{r}
+chat_ui("chat", greeting = '* <span class="suggestion submit">Which dogs would suit a small flat?</span>')
+```
 
 ## {querychat}: talk to your data
 
-<!-- TODO: placeholder - quick demo of querychat -->
+```{r}
+library(querychat)
+
+dogs <- readr::read_csv("data/dogs_details.csv")
+
+querychat_app(
+  dogs,
+  client = chat_openrouter(model = "anthropic/claude-haiku-5.5")
+)
+```
+
+- "Show me dogs that are good with other dogs"
+- "What's the average adoption fee by age?"
+
+## {querychat}: how it works
+
+- Your question is turned into **SQL** by the model
+- The SQL runs on your data frame with **DuckDB** - you see the query
+- Only the **schema** (column names, types, categories) is sent to the model, never the rows
+- Read-only by design, and the SQL is reproducible
+- Help it along with `data_description` and `greeting`
 
 ## {vitals}: evaluating LLM output
 

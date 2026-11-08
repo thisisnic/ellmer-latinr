@@ -54,6 +54,7 @@ You'll need an API key from an LLM provider. We'll be using [OpenRouter](https:/
 - Section 2: Prompt Engineering (brief)
 - Section 3: Structured Output
 - Section 4: Tool Calling
+- Section 5 (bonus, time permitting): Other Libraries for Working with LLMs in R
 - Wrap-up and Resources
 
 ### Instructor and TA
@@ -71,6 +72,7 @@ You'll need an API key from an LLM provider. We'll be using [OpenRouter](https:/
   - [Section 2: Prompt Engineering](code/02-prompt-engineering.qmd)
   - [Section 3: Extracting Structured Data](code/03-structured-data.qmd)
   - [Section 4: Tool Calling](code/04-tool-calling.qmd)
+  - [Section 5 (Bonus): Other Libraries for Working with LLMs in R](code/05-other-libraries.qmd)
 
 
 ------------------------------------------------------------------------
