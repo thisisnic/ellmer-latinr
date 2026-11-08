@@ -1,0 +1,58 @@
+---
+title: "Section 1: Getting Started with LLMs in R"
+---
+
+The script for this section of the workshop. Exercises are at the end, under **Your turn**.
+
+[Download `01-getting-started.R`](https://raw.githubusercontent.com/thisisnic/ellmer-latinr/main/code/01-getting-started.R){.btn .btn-outline-primary .btn-sm} [View on GitHub](https://github.com/thisisnic/ellmer-latinr/blob/main/code/01-getting-started.R){.btn .btn-outline-primary .btn-sm}
+
+```{.r filename="code/01-getting-started.R"}
+# 1 - Getting Started with LLMs in R
+# Using LLMs in R with ellmer - LatinR 2026
+
+## Editing your .Renviron
+
+usethis::edit_r_environ()
+
+## Starting a conversation
+
+library(ellmer)
+chat <- chat_openrouter(model = "openai/gpt-6.1-terra")
+
+## Sending a message to the LLM
+
+library(ellmer)
+chat <- chat_openrouter(model = "openai/gpt-6.1-terra")
+chat$chat("What is the most popular dog breed in the world?
+  Answer succinctly.")
+
+## Turns
+
+chat
+
+## Continuing the conversation
+
+chat$chat("What are they like to live with?")
+chat$chat("How long do they usually live?")
+chat
+
+## Reset - just start a new chat
+
+chat <- chat_openrouter(model = "openai/gpt-6.1-terra")
+chat$chat("What were we saying earlier?")
+
+## Chatting interactively
+
+live_console(chat)   # type Q to quit
+live_browser(chat)
+
+chat
+
+## Your turn
+
+# 1. Set up your API key using usethis::edit_r_environ() + restart R
+# 2. Start a conversation: chat_openrouter(model = "openai/gpt-6.1-terra")
+# 3. Paste one dog's description from dogs.csv and ask: would this dog suit
+#    a flat with no garden?
+# 4. Ask a follow-up question without repeating the description
+```

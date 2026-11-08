@@ -1,0 +1,66 @@
+---
+title: "Section 2: Prompt Engineering"
+---
+
+The script for this section of the workshop. Exercises are at the end, under **Your turn**.
+
+[Download `02-prompt-engineering.R`](https://raw.githubusercontent.com/thisisnic/ellmer-latinr/main/code/02-prompt-engineering.R){.btn .btn-outline-primary .btn-sm} [View on GitHub](https://github.com/thisisnic/ellmer-latinr/blob/main/code/02-prompt-engineering.R){.btn .btn-outline-primary .btn-sm}
+
+```{.r filename="code/02-prompt-engineering.R"}
+# 2 - Prompt Engineering (brief)
+# Using LLMs in R with ellmer - LatinR 2026
+# [OPTIONAL - cut if short on time; section 3 stands alone]
+
+library(ellmer)
+library(dplyr)
+
+dogs <- readr::read_csv("data/dogs.csv")
+
+dog_description <- dogs |>
+  slice(1) |>
+  pull(description)
+
+dog_description
+
+## Without guidance the LLM is chatty and inconsistent
+
+chat <- chat_openrouter(model = "openai/gpt-6.1-terra")
+chat$chat("Summarise this dog:", dog_description)
+
+## A system prompt sets the ground rules for the whole conversation
+
+prompt <- "You are a dog adoption assistant helping people find dogs to adopt.
+Summarise the dog description you are given to help potential adopters decide
+if the dog is a good fit for them. Respond in 50 words or fewer.
+
+## Output format
+
+Name: the dog's name
+Summary: a 1 sentence description
+Age group: one of Baby, Young, Adult, Senior
+Likes and dislikes: what the dog does and doesn't enjoy"
+
+chat <- chat_openrouter(
+  model = "openai/gpt-6.1-terra",
+  system_prompt = prompt
+)
+chat$chat("Summarise this dog:", dog_description)
+
+## Run it again - the format holds, but the wording still varies
+
+chat <- chat_openrouter(
+  model = "openai/gpt-6.1-terra",
+  system_prompt = prompt
+)
+chat$chat("Summarise this dog:", dog_description)
+
+# Prompting gets you a long way: a role, a clear task, and an output format
+# are usually enough. But the result is still free text we'd have to parse.
+# In the next section we make the model return data instead.
+
+## Your turn
+
+# 1. Pick a different dog from the dataset and run the prompt on it
+# 2. Add one more field to the output format that YOU would want to know
+#    before adopting a dog
+```

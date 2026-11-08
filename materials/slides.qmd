@@ -66,6 +66,25 @@ Have fun and experiment!
 <br/><br/>
 🐢 Tell me to slow down if needed!
 
+## Say hi to your neighbours 👋
+
+We won't go around the room, but take a couple of minutes to introduce yourself to the people next to you:
+
+- Your name and what you work on
+- What you've already tried LLMs for, and whether it worked!
+
+```{r}
+#| echo: false
+#| eval: true
+countdown::countdown(minutes = 3)
+```
+
+## Quick show of hands 🙋
+
+- Who has used ChatGPT, Claude, Gemini or similar in a browser?
+- Who has used an LLM from R or another programming language?
+- Who has used ellmer before?
+
 ## Working on Posit Cloud
 
 - <https://posit.cloud/>
@@ -1124,6 +1143,28 @@ live_console(chat)
 countdown::countdown(minutes = 15)
 ```
 
+# 5 - Bonus: Other libraries for working with LLMs in R
+
+## Bonus content
+
+If we have time, a quick look at three packages built on top of ellmer:
+
+- [{shinychat}](https://posit-dev.github.io/shinychat/) - chat UIs in Shiny
+- [{querychat}](https://posit-dev.github.io/querychat/) - ask questions of a data frame in plain language
+- [{vitals}](https://vitals.tidyverse.org/) - evaluating LLM output
+
+## {shinychat}: chat UIs in Shiny
+
+<!-- TODO: placeholder - quick demo of shinychat -->
+
+## {querychat}: talk to your data
+
+<!-- TODO: placeholder - quick demo of querychat -->
+
+## {vitals}: evaluating LLM output
+
+<!-- TODO: placeholder - quick demo of vitals -->
+
 # Wrap-up
 
 ## What we covered
@@ -1132,6 +1173,7 @@ countdown::countdown(minutes = 15)
 2. Prompt engineering for more predictable results
 3. Extracting structured data from unstructured text
 4. Using LLMs to call R functions via *tools*
+5. **Bonus:** other libraries - shinychat, querychat, vitals
 
 ## Where to go next
 
@@ -1141,6 +1183,7 @@ countdown::countdown(minutes = 15)
 - Tool calling: <https://ellmer.tidyverse.org/articles/tool-calling.html>
 - Evaluating LLM output: [{vitals}](https://vitals.tidyverse.org/)
 - Chat UIs in Shiny: [{shinychat}](https://posit-dev.github.io/shinychat/)
+- Querying data in plain language: [{querychat}](https://posit-dev.github.io/querychat/)
 
 ## Wrapping Up 🎉
 <br/><br/>

@@ -65,7 +65,12 @@ You'll need an API key from an LLM provider. We'll be using [OpenRouter](https:/
 ### Slides and code
 
 - [Slides](materials/slides.html)
-- All the code is in the [`code/`](https://github.com/thisisnic/ellmer-latinr/tree/main/code) directory of the GitHub repo, one script per section, with exercises at the end of each.
+- Code, one script per section with exercises at the end of each (also in the **Code** menu above, or the [`code/`](https://github.com/thisisnic/ellmer-latinr/tree/main/code) directory of the GitHub repo):
+  - [Section 0: Welcome and Setup](code/00-welcome-and-setup.qmd)
+  - [Section 1: Getting Started with LLMs in R](code/01-getting-started.qmd)
+  - [Section 2: Prompt Engineering](code/02-prompt-engineering.qmd)
+  - [Section 3: Extracting Structured Data](code/03-structured-data.qmd)
+  - [Section 4: Tool Calling](code/04-tool-calling.qmd)
 
 
 ------------------------------------------------------------------------

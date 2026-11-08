@@ -1,0 +1,41 @@
+---
+title: "Section 0: Welcome and Setup"
+---
+
+Housekeeping before we start:
+
+- Work on [Posit Cloud](https://posit.cloud/), or your own laptop if you've done the [prework](../index.qmd#workshop-prework).
+- You'll need an OpenRouter API key. You should have received one today; if not, let us know.
+- Please ask questions, and tell me to slow down if needed. Yani is here to help with the exercises.
+- The code for each section is in the **Code** menu above, one script per section.
+
+Run the script below to make sure everything works before Section 1.
+
+[Download `00-welcome-and-setup.R`](https://raw.githubusercontent.com/thisisnic/ellmer-latinr/main/code/00-welcome-and-setup.R){.btn .btn-outline-primary .btn-sm} [View on GitHub](https://github.com/thisisnic/ellmer-latinr/blob/main/code/00-welcome-and-setup.R){.btn .btn-outline-primary .btn-sm}
+
+```{.r filename="code/00-welcome-and-setup.R"}
+# 0 - Welcome and Setup
+# Using LLMs in R with ellmer - LatinR 2026
+
+## Install the packages we'll use
+
+install.packages(c("ellmer", "dplyr", "readr", "tidyr", "usethis"))
+
+## Add your OpenRouter API key to .Renviron
+## (you'll be given a key on the day; ask us if you haven't got one)
+
+usethis::edit_r_environ()
+
+# Add this line to the file that opens, save it, then restart R:
+# OPENROUTER_API_KEY=your-key-here
+
+## Check the key is picked up
+
+Sys.getenv("OPENROUTER_API_KEY") != ""
+
+## Check ellmer can talk to the provider
+
+library(ellmer)
+chat <- chat_openrouter(model = "openai/gpt-6.1-terra")
+chat$chat("Say hello in one short sentence.")
+```

@@ -1,0 +1,170 @@
+---
+title: "Section 4: Tool Calling"
+---
+
+The script for this section of the workshop. Exercises are at the end, under **Your turn**.
+
+[Download `04-tool-calling.R`](https://raw.githubusercontent.com/thisisnic/ellmer-latinr/main/code/04-tool-calling.R){.btn .btn-outline-primary .btn-sm} [View on GitHub](https://github.com/thisisnic/ellmer-latinr/blob/main/code/04-tool-calling.R){.btn .btn-outline-primary .btn-sm}
+
+```{.r filename="code/04-tool-calling.R"}
+# 4 - Tool Calling
+# Using LLMs in R with ellmer - LatinR 2026
+
+library(ellmer)
+library(dplyr)
+
+## Client-side vs server-side tools
+
+# A tool is a function the model can ask to have run for it. There are two
+# kinds:
+#
+# SERVER-SIDE tools run on the provider's infrastructure. The model calls
+# them without R being involved. Web search is the most common example.
+#
+# CLIENT-SIDE tools are R functions on our machine. The model asks for them,
+# ellmer runs them, and sends the result back to the model.
+
+## Server-side: web search with ":online"
+
+# Without search, the model only knows what it learned in training...
+chat <- chat_openrouter(model = "openai/gpt-6.1-terra")
+chat$chat("Which dog breeds are most popular this year?")
+
+# ...with search, OpenRouter runs a web search before the model answers
+chat <- chat_openrouter(model = "openai/gpt-6.1-terra:online")
+chat$chat("Which dog breeds are most popular this year?")
+
+# The search happened on the provider's side. There is no tool call for
+# ellmer to run, so the turn just contains the answer
+chat$last_turn()
+
+## Client-side: your own R functions as tools
+
+# Define the function
+get_time <- function() {
+  format(Sys.time(), "%A %d %B %Y, %H:%M")
+}
+
+# Create tool
+time_tool <- tool(get_time, "Get the current date and time")
+
+# Without the tool the model has to guess...
+chat <- chat_openrouter(model = "openai/gpt-6.1-terra")
+chat$chat("what date is it right now?")
+
+# ...with the tool it asks ellmer to run our function
+chat$register_tool(time_tool)
+chat$chat("what date is it right now?")
+
+# Print the chat to see the tool request and result in the history
+chat
+
+## Giving the model our dog database
+
+# We don't need a tool to filter the data - we can just send the file
+prompt <- "You are a dog adoption assistant helping the user choose a dog
+from the listings they give you."
+
+chat <- chat_openrouter(
+  model = "openai/gpt-6.1-terra",
+  system_prompt = prompt
+)
+
+chat$chat(
+  "Here are the dogs available:",
+  content_document_file("data/dogs_details.csv")
+)
+chat$chat("I live in a small flat and already have a dog. Which three would suit me?")
+
+## A tool that changes things: save a shortlist to a file
+
+# Define the function - note it returns a string describing what it did
+save_shortlist <- function(names, path) {
+  writeLines(names, path)
+  paste("Saved", length(names), "dogs to", path)
+}
+
+# Create tool - this time with arguments the model has to supply
+save_shortlist_tool <- tool(
+  save_shortlist,
+  "Save a shortlist of dog names to a text file",
+  arguments = list(
+    names = type_array(type_string("Dog names")),
+    path = type_string("File path to save to")
+  )
+)
+
+chat$register_tool(save_shortlist_tool)
+chat$chat("Save those three to shortlist.txt")
+
+readLines("shortlist.txt")
+
+## Should the model be allowed to do that?
+
+# Checking the time just reads something. Saving a file changes something on
+# our machine, and we might want a say in that. Annotations let us describe
+# what each tool does...
+time_tool <- tool(
+  get_time,
+  "Get the current date and time",
+  annotations = tool_annotations(read_only_hint = TRUE)
+)
+
+save_shortlist_tool <- tool(
+  save_shortlist,
+  "Save a shortlist of dog names to a text file",
+  arguments = list(
+    names = type_array(type_string("Dog names")),
+    path = type_string("File path to save to")
+  ),
+  annotations = tool_annotations(read_only_hint = FALSE)
+)
+
+# ...and on_tool_request() runs before every tool call. Return nothing to
+# allow it, or call tool_reject() to block it.
+chat <- chat_openrouter(
+  model = "openai/gpt-6.1-terra",
+  system_prompt = prompt
+)
+chat$register_tool(time_tool)
+chat$register_tool(save_shortlist_tool)
+
+chat$on_tool_request(function(request) {
+  # Read-only tools go straight through
+  if (isTRUE(request@tool@annotations$read_only_hint)) {
+    return()
+  }
+
+  cat("The model wants to run", request@name, "with arguments:\n")
+  str(request@arguments)
+
+  answer <- readline("Allow? (y/n) ")
+  if (tolower(answer) != "y") {
+    tool_reject("The user did not approve this action")
+  }
+})
+
+chat$chat(
+  "Here are the dogs available:",
+  content_document_file("data/dogs_details.csv")
+)
+
+# Answer "n" when asked - the model is told why, and carries on gracefully
+chat$chat("Pick two adult dogs and save them to adults.txt")
+file.exists("adults.txt")
+
+# Read-only tools don't trigger the question
+chat$chat("what time is it?")
+
+## Try it live
+
+live_console(chat)
+
+## Your turn
+
+# 1. Ask the assistant to save a different shortlist, and approve it this time
+# 2. Change the rule in on_tool_request() so saving is only ever allowed to
+#    files ending in ".txt", without asking
+# 3. Bonus: log every tool call (name and arguments) to a data frame using
+#    on_tool_request(), so you can see what the model did during a chat
+```

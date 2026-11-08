@@ -24,6 +24,18 @@ website:
         text: Home
       - text: Slides
         href: materials/slides.html
+      - text: Code
+        menu:
+          - text: "0: Welcome and Setup"
+            href: code/00-welcome-and-setup.qmd
+          - text: "1: Getting Started with LLMs in R"
+            href: code/01-getting-started.qmd
+          - text: "2: Prompt Engineering"
+            href: code/02-prompt-engineering.qmd
+          - text: "3: Extracting Structured Data"
+            href: code/03-structured-data.qmd
+          - text: "4: Tool Calling"
+            href: code/04-tool-calling.qmd
 
 format:
   html:
