@@ -213,7 +213,12 @@ by country and data source.
 ## Your turn
 
 1. Save your API key with `usethis::edit_r_environ()` and restart R
-2. Start a conversation: `chat <- chat_openrouter(model = "anthropic/claude-haiku-5.5")`
+2. Start a conversation:
+
+   ```r
+   chat <- chat_openrouter(model = "anthropic/claude-haiku-5.5")
+   ```
+
 3. Ask it a question with `chat$chat()` and check you get an answer back
 
 ```{r}
@@ -286,7 +291,7 @@ token_usage()
 1 OpenRouter anthropic/claude-haiku-5.5    32     66            0    NA
 ```
 
-Handy for keeping an eye on usage when you start looping over data. Price is `NA` here because OpenRouter doesn't report it - check your OpenRouter dashboard instead.
+Handy for keeping an eye on usage when you start looping over data.
 
 ## Continuing the conversation
 

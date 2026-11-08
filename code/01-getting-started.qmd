@@ -10,6 +10,11 @@ The script for this section of the workshop. Exercises are at the end, under **Y
 # 1 - Getting Started with LLMs in R
 # Using LLMs in R with ellmer - LatinR 2026
 
+## Editing your .Renviron
+
+# Add a line like OPENROUTER_API_KEY=sk12345567890, save, then restart R
+usethis::edit_r_environ()
+
 ## Starting a conversation
 
 library(ellmer)
@@ -22,8 +27,7 @@ chat$chat("What is the most popular dog breed in the world?
 
 ## Your turn (1)
 
-# 1. If you haven't yet: save your API key with usethis::edit_r_environ()
-#    and restart R
+# 1. Save your API key with usethis::edit_r_environ() and restart R
 # 2. Start a conversation: chat <- chat_openrouter(model = "anthropic/claude-haiku-5.5")
 # 3. Ask it a question with chat$chat() and check you get an answer back
 
