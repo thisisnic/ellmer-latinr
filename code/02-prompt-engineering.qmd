@@ -7,7 +7,7 @@ The script for this section of the workshop. Exercises are at the end, under **Y
 [Download `02-prompt-engineering.R`](https://raw.githubusercontent.com/thisisnic/ellmer-latinr/main/code/02-prompt-engineering.R){.btn .btn-outline-primary .btn-sm} [View on GitHub](https://github.com/thisisnic/ellmer-latinr/blob/main/code/02-prompt-engineering.R){.btn .btn-outline-primary .btn-sm}
 
 ```{.r filename="code/02-prompt-engineering.R"}
-# 2 - Prompt Engineering (brief)
+# 2 - Prompt Engineering
 # Using LLMs in R with ellmer - LatinR 2026
 
 library(ellmer)

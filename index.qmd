@@ -51,7 +51,7 @@ You'll need an API key from an LLM provider. We'll be using [OpenRouter](https:/
 
 - Section 0: Welcome and Setup
 - Section 1: Getting Started with LLMs in R
-- Section 2: Prompt Engineering (brief)
+- Section 2: Prompt Engineering
 - Section 3: Structured Output
 - Section 4: Tool Calling
 - Section 5 (bonus, time permitting): Other Libraries for Working with LLMs in R

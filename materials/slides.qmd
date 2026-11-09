@@ -39,14 +39,15 @@ execute:
 
 ## What we'll learn
 
-1. **Welcome and setup** - we're here!
-2. Getting started with LLMs in R
-3. Prompt engineering for more predictable results
+0. **Welcome and setup** - we're here!
+1. Getting started with LLMs in R
+2. Prompt engineering for more predictable results
 
 **BREAK**
 
-4. Extracting structured data from unstructured text
-5. Using LLMs to call R functions via *tools*
+3. Extracting structured data from unstructured text
+4. Using LLMs to call R functions via *tools*
+5. **Bonus, if there's time:** other libraries for LLMs in R
 
 ## Format
 
@@ -351,14 +352,14 @@ A new chat object has no history - the Labrador is gone
 
 ## Chatting interactively
 
-Typing `chat$chat()` every time gets old. Two shortcuts:
+Typing `chat$chat()` every time gets old. `live_browser()` opens the chat in a browser window:
 
 ```{r}
-live_console(chat)   # chat in the R console, type Q to quit
-live_browser(chat)   # chat in a browser window
+chat <- chat_openrouter(model = "anthropic/claude-haiku-5.5")
+live_browser(chat)
 ```
 
-Both carry on the same conversation - `chat` still has all the turns afterwards.
+It carries on the same conversation - `chat` still has all the turns when you close the window.
 
 ## Your turn
 
@@ -1343,7 +1344,7 @@ The model is told why, and carries on gracefully
 ```{r}
 #| echo: false
 #| eval: true
-countdown::countdown(minutes = 15)
+countdown::countdown(minutes = 10)
 ```
 
 # 5 - Bonus: Other libraries for working with LLMs in R

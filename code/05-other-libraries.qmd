@@ -56,7 +56,11 @@ prompt <- paste(
   dogs_csv
 )
 
-save_shortlist <- function(names, path) {
+save_shortlist <- function(names) {
+  path <- "dog_shortlist.txt"
+  if (file.exists(path)) {
+    stop("File already exists, please choose a different path")
+  }
   writeLines(names, path)
   paste("Saved", length(names), "dogs to", path)
 }
@@ -65,8 +69,7 @@ save_shortlist_tool <- tool(
   save_shortlist,
   "Save a shortlist of dog names to a text file",
   arguments = list(
-    names = type_array(type_string(), "Names of the dogs to save"),
-    path = type_string("File path to save to, e.g. shortlist.txt")
+    names = type_array(type_string("Dog names"))
   )
 )
 
@@ -78,7 +81,7 @@ Try one of these:
 
 * <span class=\"suggestion submit\">Which dogs would suit a small flat?</span>
 * <span class=\"suggestion submit\">Which dogs are good with other dogs?</span>
-* <span class=\"suggestion\">Save a shortlist of ... to shortlist.txt</span>
+* <span class=\"suggestion\">Save a shortlist of ...</span>
 "
 
 ui <- page_fillable(

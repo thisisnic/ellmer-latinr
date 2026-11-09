@@ -49,7 +49,7 @@ chat$chat("What is its favourite food?")
 ## Chatting interactively
 
 chat <- chat_openrouter(model = "anthropic/claude-haiku-5.5")
-live_console(chat)   # type Q to quit
+# Opens the chat in a browser window. Close it and chat still has all the turns
 live_browser(chat)
 
 chat

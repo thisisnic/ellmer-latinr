@@ -1,4 +1,4 @@
-# 2 - Prompt Engineering (brief)
+# 2 - Prompt Engineering
 # Using LLMs in R with ellmer - LatinR 2026
 
 library(ellmer)

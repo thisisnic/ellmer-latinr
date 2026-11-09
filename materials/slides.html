@@ -2359,15 +2359,16 @@ Nic Crane
 </section>
 <section id="what-well-learn" class="slide level2">
 <h2>What we’ll learn</h2>
-<ol type="1">
+<ol start="0" type="1">
 <li><strong>Welcome and setup</strong> - we’re here!</li>
 <li>Getting started with LLMs in R</li>
 <li>Prompt engineering for more predictable results</li>
 </ol>
 <p><strong>BREAK</strong></p>
-<ol start="4" type="1">
+<ol start="3" type="1">
 <li>Extracting structured data from unstructured text</li>
 <li>Using LLMs to call R functions via <em>tools</em></li>
+<li><strong>Bonus, if there’s time:</strong> other libraries for LLMs in R</li>
 </ol>
 </section>
 <section id="format" class="slide level2">
@@ -2387,7 +2388,7 @@ Nic Crane
 </ul>
 <div class="cell">
 <div class="cell-output-display">
-<countdown-timer class="countdown" id="timer_cf8523af" minutes="3" seconds="0" update-every="1" tabindex="0" style="right:0;bottom:0;"></countdown-timer>
+<countdown-timer class="countdown" id="timer_0d1e76be" minutes="3" seconds="0" update-every="1" tabindex="0" style="right:0;bottom:0;"></countdown-timer>
 </div>
 </div>
 </section>
@@ -2563,7 +2564,7 @@ by country and data source.</code></pre>
 </ol>
 <div class="cell">
 <div class="cell-output-display">
-<countdown-timer class="countdown" id="timer_e0405d0e" minutes="10" seconds="0" update-every="1" tabindex="0" style="right:0;bottom:0;"></countdown-timer>
+<countdown-timer class="countdown" id="timer_532a4b49" minutes="10" seconds="0" update-every="1" tabindex="0" style="right:0;bottom:0;"></countdown-timer>
 </div>
 </div>
 </section>
@@ -2694,12 +2695,12 @@ known about its favourite food...</code></pre>
 </section>
 <section id="chatting-interactively" class="slide level2">
 <h2>Chatting interactively</h2>
-<p>Typing <code>chat$chat()</code> every time gets old. Two shortcuts:</p>
+<p>Typing <code>chat$chat()</code> every time gets old. <code>live_browser()</code> opens the chat in a browser window:</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href></a><span class="fu">live_console</span>(chat)   <span class="co"># chat in the R console, type Q to quit</span></span>
-<span id="cb16-2"><a href></a><span class="fu">live_browser</span>(chat)   <span class="co"># chat in a browser window</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href></a>chat <span class="ot">&lt;-</span> <span class="fu">chat_openrouter</span>(<span class="at">model =</span> <span class="st">&quot;anthropic/claude-haiku-5.5&quot;</span>)</span>
+<span id="cb16-2"><a href></a><span class="fu">live_browser</span>(chat)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<p>Both carry on the same conversation - <code>chat</code> still has all the turns afterwards.</p>
+<p>It carries on the same conversation - <code>chat</code> still has all the turns when you close the window.</p>
 </section>
 <section id="your-turn-1" class="slide level2">
 <h2>Your turn</h2>
@@ -2710,7 +2711,7 @@ known about its favourite food...</code></pre>
 </ol>
 <div class="cell">
 <div class="cell-output-display">
-<countdown-timer class="countdown" id="timer_cd1baebd" minutes="10" seconds="0" update-every="1" tabindex="0" style="right:0;bottom:0;"></countdown-timer>
+<countdown-timer class="countdown" id="timer_7ef0cf77" minutes="10" seconds="0" update-every="1" tabindex="0" style="right:0;bottom:0;"></countdown-timer>
 </div>
 </div>
 </section>
@@ -2752,7 +2753,7 @@ The adoption fee is $300. ...</code></pre>
 </ol>
 <div class="cell">
 <div class="cell-output-display">
-<countdown-timer class="countdown" id="timer_1bde019b" minutes="5" seconds="0" update-every="1" tabindex="0" style="right:0;bottom:0;"></countdown-timer>
+<countdown-timer class="countdown" id="timer_444f0bb0" minutes="5" seconds="0" update-every="1" tabindex="0" style="right:0;bottom:0;"></countdown-timer>
 </div>
 </div>
 </section></section>
@@ -2971,7 +2972,7 @@ pools, and fenced-yard play. Dislikes sharing his stuffed animals ...</code></pr
 </ol>
 <div class="cell">
 <div class="cell-output-display">
-<countdown-timer class="countdown" id="timer_6616d998" minutes="8" seconds="0" update-every="1" tabindex="0" style="right:0;bottom:0;"></countdown-timer>
+<countdown-timer class="countdown" id="timer_93c5f15f" minutes="8" seconds="0" update-every="1" tabindex="0" style="right:0;bottom:0;"></countdown-timer>
 </div>
 </div>
 </section></section>
@@ -3143,7 +3144,7 @@ mom&#39;s yard. ...
 </ol>
 <div class="cell">
 <div class="cell-output-display">
-<countdown-timer class="countdown" id="timer_6f5fdedb" minutes="10" seconds="0" update-every="1" tabindex="0" style="right:0;bottom:0;"></countdown-timer>
+<countdown-timer class="countdown" id="timer_a6f0c7f5" minutes="10" seconds="0" update-every="1" tabindex="0" style="right:0;bottom:0;"></countdown-timer>
 </div>
 </div>
 </section>
@@ -3253,7 +3254,7 @@ $age
 </ol>
 <div class="cell">
 <div class="cell-output-display">
-<countdown-timer class="countdown" id="timer_a74a652e" minutes="8" seconds="0" update-every="1" tabindex="0" style="right:0;bottom:0;"></countdown-timer>
+<countdown-timer class="countdown" id="timer_9857ec59" minutes="8" seconds="0" update-every="1" tabindex="0" style="right:0;bottom:0;"></countdown-timer>
 </div>
 </div>
 </section>
@@ -3292,7 +3293,7 @@ $age
 </ol>
 <div class="cell">
 <div class="cell-output-display">
-<countdown-timer class="countdown" id="timer_14fb22d8" minutes="5" seconds="0" update-every="1" tabindex="0" style="right:0;bottom:0;"></countdown-timer>
+<countdown-timer class="countdown" id="timer_de2589c5" minutes="5" seconds="0" update-every="1" tabindex="0" style="right:0;bottom:0;"></countdown-timer>
 </div>
 </div>
 </section></section>
@@ -3434,7 +3435,7 @@ It&#39;s Monday, 9 November 2026, at 14:31 (2:31 PM).</code></pre>
 </ol>
 <div class="cell">
 <div class="cell-output-display">
-<countdown-timer class="countdown" id="timer_90f57698" minutes="10" seconds="0" update-every="1" tabindex="0" style="right:0;bottom:0;"></countdown-timer>
+<countdown-timer class="countdown" id="timer_be545311" minutes="10" seconds="0" update-every="1" tabindex="0" style="right:0;bottom:0;"></countdown-timer>
 </div>
 </div>
 </section>
@@ -3647,7 +3648,7 @@ and other dogs ...</code></pre>
 </ol>
 <div class="cell">
 <div class="cell-output-display">
-<countdown-timer class="countdown" id="timer_9739f42e" minutes="15" seconds="0" update-every="1" tabindex="0" style="right:0;bottom:0;"></countdown-timer>
+<countdown-timer class="countdown" id="timer_20636e8a" minutes="10" seconds="0" update-every="1" tabindex="0" style="right:0;bottom:0;"></countdown-timer>
 </div>
 </div>
 </section></section>
