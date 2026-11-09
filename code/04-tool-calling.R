@@ -2,34 +2,13 @@
 # Using LLMs in R with ellmer - LatinR 2026
 
 library(ellmer)
-library(dplyr)
 
-## Client-side vs server-side tools
+## Without a tool the model can't know...
 
-# A tool is a function the model can ask to have run for it. There are two
-# kinds:
-#
-# SERVER-SIDE tools run on the provider's infrastructure. The model calls
-# them without R being involved. Web search is the most common example.
-#
-# CLIENT-SIDE tools are R functions on our machine. The model asks for them,
-# ellmer runs them, and sends the result back to the model.
-
-## Server-side: web search with ":online"
-
-# Without search, the model only knows what it learned in training...
 chat <- chat_openrouter(model = "anthropic/claude-haiku-5.5")
-chat$chat("Which dog breeds are most popular this year?")
+chat$chat("what's the time and date right now?")
 
-# ...with search, OpenRouter runs a web search before the model answers
-chat <- chat_openrouter(model = "anthropic/claude-haiku-5.5:online")
-chat$chat("Which dog breeds are most popular this year?")
-
-# The search happened on the provider's side. There is no tool call for
-# ellmer to run, so the turn just contains the answer
-chat$last_turn()
-
-## Client-side: your own R functions as tools
+## Your own R function as a tool
 
 # Define the function
 get_time <- function() {
@@ -39,56 +18,64 @@ get_time <- function() {
 # Create tool
 time_tool <- tool(get_time, "Get the current date and time")
 
-# Without the tool the model has to guess...
-chat <- chat_openrouter(model = "anthropic/claude-haiku-5.5")
-chat$chat("what date is it right now?")
-
-# ...with the tool it asks ellmer to run our function
+# Register the tool with the chat, then ask again
 chat$register_tool(time_tool)
-chat$chat("what date is it right now?")
+chat$chat("what's the time and date right now?")
 
-# Print the chat to see the tool request and result in the history
+# The tool call is part of the conversation
 chat
 
-## Giving the model our dog database
+# How it works: the assistant turn requests the tool, ellmer runs the R
+# function and sends the result back as a user turn
+chat$get_turns()
 
-# We don't need a tool to filter the data - we can just send the file
-prompt <- "You are a dog adoption assistant helping the user choose a dog
-from the listings they give you."
+## Your turn (1)
 
-chat <- chat_openrouter(
-  model = "anthropic/claude-haiku-5.5",
-  system_prompt = prompt
-)
+# 1. Write an R function that returns something the model can't know - e.g.
+#    a random number with sample(), or how many rows are in dogs
+# 2. Turn it into a tool with tool() and register it with a chat
+# 3. Ask a question that needs it, then print the chat to see the tool call
+
+## Giving the model our dog data
+
+# We don't always need a tool - sometimes we can just send the data
+chat <- chat_openrouter(model = "anthropic/claude-haiku-5.5")
 
 chat$chat(
+  "I live in a small flat and already have a dog. Which three would suit me?",
   "Here are the dogs available:",
   content_document_file("data/dogs_details.csv")
 )
-chat$chat("I live in a small flat and already have a dog. Which three would suit me?")
 
 ## A tool that changes things: save a shortlist to a file
 
-# Define the function - note it returns a string describing what it did
-save_shortlist <- function(names, path) {
+# Define the function - it returns a string describing what it did
+save_shortlist <- function(names) {
+  path <- "dog_shortlist.txt"
+  if (file.exists(path)) {
+    stop("File already exists, please choose a different path")
+  }
   writeLines(names, path)
   paste("Saved", length(names), "dogs to", path)
 }
 
-# Create tool - this time with arguments the model has to supply
+# Create tool - this time with an argument the model has to supply
 save_shortlist_tool <- tool(
   save_shortlist,
   "Save a shortlist of dog names to a text file",
   arguments = list(
-    names = type_array(type_string("Dog names")),
-    path = type_string("File path to save to")
+    names = type_array(type_string("Dog names"))
   )
 )
 
 chat$register_tool(save_shortlist_tool)
-chat$chat("Save those three to shortlist.txt")
+chat$chat("Save the recommended dogs to the shortlist")
 
-readLines("shortlist.txt")
+readLines("dog_shortlist.txt")
+
+# The file already exists, so the function errors. The error message goes
+# back to the model as the tool result
+chat$chat("Save me 2 more random dogs to the shortlist")
 
 ## Should the model be allowed to do that?
 
@@ -105,18 +92,17 @@ save_shortlist_tool <- tool(
   save_shortlist,
   "Save a shortlist of dog names to a text file",
   arguments = list(
-    names = type_array(type_string("Dog names")),
-    path = type_string("File path to save to")
+    names = type_array(type_string("Dog names"))
   ),
   annotations = tool_annotations(read_only_hint = FALSE)
 )
 
+# Don't forget to delete the shortlist from earlier!
+file.remove("dog_shortlist.txt")
+
 # ...and on_tool_request() runs before every tool call. Return nothing to
 # allow it, or call tool_reject() to block it.
-chat <- chat_openrouter(
-  model = "anthropic/claude-haiku-5.5",
-  system_prompt = prompt
-)
+chat <- chat_openrouter(model = "anthropic/claude-haiku-5.5")
 chat$register_tool(time_tool)
 chat$register_tool(save_shortlist_tool)
 
@@ -131,30 +117,26 @@ chat$on_tool_request(function(request) {
 
   answer <- readline("Allow? (y/n) ")
   if (tolower(answer) != "y") {
-    tool_reject("The user did not approve this action")
+    tool_reject("The user declined when asked for approval")
   }
 })
 
+# Read-only tools don't trigger the question
+chat$chat("What's the time?")
+
+# Answer "n" when asked - the model is told why, and carries on gracefully
 chat$chat(
+  "Pick two random adult dogs and save them to the shortlist",
   "Here are the dogs available:",
   content_document_file("data/dogs_details.csv")
 )
+file.exists("dog_shortlist.txt")
 
-# Answer "n" when asked - the model is told why, and carries on gracefully
-chat$chat("Pick two adult dogs and save them to adults.txt")
-file.exists("adults.txt")
+## Your turn (2)
 
-# Read-only tools don't trigger the question
-chat$chat("what time is it?")
-
-## Try it live
-
-live_console(chat)
-
-## Your turn
-
-# 1. Ask the assistant to save a different shortlist, and approve it this time
-# 2. Change the rule in on_tool_request() so saving is only ever allowed to
-#    files ending in ".txt", without asking
+# 1. Ask the assistant to save a shortlist again, and approve it this time
+#    (delete dog_shortlist.txt first!)
+# 2. Change the rule in on_tool_request() so saving is allowed without asking
+#    when it's 3 dogs or fewer
 # 3. Bonus: log every tool call (name and arguments) to a data frame using
 #    on_tool_request(), so you can see what the model did during a chat

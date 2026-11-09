@@ -975,9 +975,9 @@ countdown::countdown(minutes = 5)
 
 By the end of this section you'll be able to:
 
-- Understand the difference between tools the provider runs and tools you run
 - Give the model your own R functions as tools
-- Decide when to send data directly versus provide a tool to fetch it
+- See how a tool request and result show up in the conversation
+- Decide when to send data directly versus provide a tool
 - Review and block tool calls before they run with `on_tool_request()`
 
 ## Tools
@@ -993,60 +993,7 @@ By the end of this section you'll be able to:
 - Perform calculations accurately
 - ...anything you can do with an R function!
 
-## Two kinds of tool
-
-**Server-side** - run on the provider's infrastructure
-
-- The model calls them without R being involved
-- Web search is the most common example
-
-**Client-side** - R functions on our machine
-
-- The model asks for them, ellmer runs them, sends the result back
-
-## Server-side: web search
-
-Without search, the model only knows what it learned in training...
-
-```{r}
-chat <- chat_openrouter(model = "anthropic/claude-haiku-5.5")
-chat$chat("Which dog breeds are most popular this year?")
-```
-
-```
-I can't verify this year's rankings, but the American Kennel Club's
-**2024 U.S. registration rankings** placed these breeds in the top
-five:
-
-1. French bulldog
-2. Labrador retriever
-...
-```
-
-## Server-side: web search with `:online` {.smaller}
-
-```{r}
-chat <- chat_openrouter(model = "anthropic/claude-haiku-5.5:online")
-chat$chat("Which dog breeds are most popular this year?")
-```
-
-```
-In the United States, the **French Bulldog** tops the latest American
-Kennel Club ranking, released in 2026 and based on 2025
-registrations:
-([akc.org](https://www.akc.org/press-releases/je-taime-once-again-...))
-
-1. French Bulldog
-2. Labrador Retriever
-3. Golden Retriever
-4. German Shepherd Dog
-5. Dachshund
-...
-```
-
-OpenRouter ran a web search before the model answered. No tool call for ellmer to run - the turn just contains the answer.
-
-## How client-side tools work
+## How tools work
 
 1. Send message
 2. LLM decides if tool needed
@@ -1061,15 +1008,20 @@ OpenRouter ran a web search before the model answered. No tool call for ellmer t
 2. Turn it into a tool
 3. Register tool with a chat object
 
-## Without a tool the model has to guess...
+## Without a tool the model can't know...
 
 ```{r}
 chat <- chat_openrouter(model = "anthropic/claude-haiku-5.5")
-chat$chat("what date is it right now?")
+chat$chat("what's the time and date right now?")
 ```
 
 ```
-Today is March 2, 2026.
+I don't have access to a clock or calendar, so I can't tell you the
+current time or date. I also don't have real-time information about
+the world.
+
+To check, you can look at your device's clock, or search "current
+time" or "today's date" in a search engine. ...
 ```
 
 ## What's the time?
@@ -1085,13 +1037,13 @@ time_tool <- tool(get_time, "Get the current date and time")
 
 # Register the tool with the chat
 chat$register_tool(time_tool)
-chat$chat("what date is it right now?")
+chat$chat("what's the time and date right now?")
 ```
 
 ```
 ◯ [tool call] get_time()
-● #> Saturday 07 November 2026, 15:00
-Today is November 7, 2026.
+● #> Monday 09 November 2026, 14:31
+It's Monday, 9 November 2026, at 14:31 (2:31 PM).
 ```
 
 ## The tool call is part of the conversation {.smaller}
@@ -1101,77 +1053,102 @@ chat
 ```
 
 ```
-<Chat OpenRouter/anthropic/claude-haiku-5.5 turns=6 input=192 output=90>
+<Chat OpenRouter/anthropic/claude-haiku-5.5 turns=6 input=1017 output=242>
 ── user ────────────────────────────────────────────────────
-what date is it right now?
-── assistant [input=13 output=49] ──────────────────────────
-Today is March 2, 2026.
+what's the time and date right now?
+── assistant [input=17 output=94] ──────────────────────────
+I don't have access to a clock or calendar, so I can't tell you ...
 ── user ────────────────────────────────────────────────────
-what date is it right now?
-── assistant [input=71 output=27] ──────────────────────────
-[tool request (call_Jkx5jaGcUjIX8YXxkyo4oPgC)]: get_time()
+what's the time and date right now?
+── assistant [input=477 output=77] ─────────────────────────
+[tool request (toolu_01AVf9G6V5YHhoR63E26HyzB)]: get_time()
 ── user ────────────────────────────────────────────────────
-[tool result  (call_Jkx5jaGcUjIX8YXxkyo4oPgC)]: Saturday 07 November 2026, 15:00
-── assistant [input=108 output=14] ─────────────────────────
-Today is November 7, 2026.
+[tool result  (toolu_01AVf9G6V5YHhoR63E26HyzB)]: Monday 09 November 2026, 14:31
+── assistant [input=523 output=71] ─────────────────────────
+It's Monday, 9 November 2026, at 14:31 (2:31 PM).
 ```
 
-## Giving the model our dog database
+Notice the input tokens jumped once the tool was registered - its description is sent every turn
+
+## How it works: request and result {.smaller}
+
+```{r}
+chat$get_turns()
+```
+
+```
+[[3]]
+<Turn: user>
+what's the time and date right now?
+
+[[4]]
+<Turn: assistant>
+[tool request (toolu_01AVf9G6V5YHhoR63E26HyzB)]: get_time()
+
+[[5]]
+<Turn: user>
+[tool result  (toolu_01AVf9G6V5YHhoR63E26HyzB)]: Monday 09 November 2026, 14:31
+
+[[6]]
+<Turn: assistant>
+It's Monday, 9 November 2026, at 14:31 (2:31 PM).
+```
+
+- The **assistant** turn asks for the tool, with its arguments
+- ellmer runs the R function and sends the result back as a **user** turn
+- The model never runs anything itself - it only asks
+
+## Your turn
+
+1. Write an R function that returns something the model can't know - e.g. a random number with `sample()`, or how many rows are in `dogs`
+2. Turn it into a tool with `tool()` and register it with a chat
+3. Ask a question that needs it, then print the chat to see the tool call
+
+```{r}
+#| echo: false
+#| eval: true
+countdown::countdown(minutes = 10)
+```
+
+## Giving the model our dog data {.smaller}
 
 We don't always need a tool - sometimes we can just send the data
 
 ```{r}
-prompt <- "You are a dog adoption assistant helping the user choose a dog
-from the listings they give you."
-
-chat <- chat_openrouter(
-  model = "anthropic/claude-haiku-5.5",
-  system_prompt = prompt
-)
+chat <- chat_openrouter(model = "anthropic/claude-haiku-5.5")
 
 chat$chat(
+  "I live in a small flat and already have a dog. Which three would suit me?",
   "Here are the dogs available:",
   content_document_file("data/dogs_details.csv")
 )
 ```
 
 ```
-I've got the listings! What are you looking for in a dog? It would
-help to know:
+Based on the listings, these three would suit a small flat with a
+resident dog:
 
-- Your location and how far you're willing to travel
-- Whether you have children or other pets
-...
-```
+1. **Trixie** (2-year-old Chihuahua mix, 10-12 lbs): described as
+sweet, quiet, and calm, housebroken, and great with other dogs.
+2. **Gypsy Girl** (4-year-old Chihuahua mix, 15 lbs): gentle and
+loving, good with both dogs and people.
+3. **Lamb Chop** (3-year-old, about 12 lbs): good with other dogs,
+loves people, and is small enough for a flat.
 
-## Ask for a recommendation {.smaller}
-
-```{r}
-chat$chat("I live in a small flat and already have a dog. Which three would suit me?")
-```
-
-```
-Based on their size and reported friendliness with other dogs, these
-three look like promising matches:
-
-1. **Trixie** — A 10–12 lb Chihuahua mix described as quiet, calm,
-housebroken and great with other dogs. She looks like the strongest
-fit for a small flat.
-2. **Gypsy Girl** — A 15 lb Chihuahua mix who is gentle and good with
-other dogs. She can be shy at first but reportedly warms up quickly.
-3. **Pippin** — About 10 lb and described as loving people and good
-with other dogs. Her energy level and house-training aren't
-specified, so those are worth asking about.
-...
+**Good alternative:** **Pippin** (2 years old, about 10 lbs) ...
 ```
 
 ## A tool that changes things {.smaller}
 
-Save a shortlist to a file - this time the tool takes arguments the model has to supply
+Save a shortlist to a file - this time the tool takes an argument the model has to supply
 
 ```{r}
-# Define the function - note it returns a string describing what it did
-save_shortlist <- function(names, path) {
+# Define the function - it returns a string describing what it did
+save_shortlist <- function(names) {
+  path <- "dog_shortlist.txt"
+  if (file.exists(path)) {
+    stop("File already exists, please choose a different path")
+  }
   writeLines(names, path)
   paste("Saved", length(names), "dogs to", path)
 }
@@ -1181,8 +1158,7 @@ save_shortlist_tool <- tool(
   save_shortlist,
   "Save a shortlist of dog names to a text file",
   arguments = list(
-    names = type_array(type_string("Dog names")),
-    path = type_string("File path to save to")
+    names = type_array(type_string("Dog names"))
   )
 )
 ```
@@ -1191,23 +1167,40 @@ save_shortlist_tool <- tool(
 
 ```{r}
 chat$register_tool(save_shortlist_tool)
-chat$chat("Save those three to shortlist.txt")
+chat$chat("Save the recommended dogs to the shortlist")
 ```
 
 ```
-◯ [tool call] save_shortlist(names = c("Trixie", "Gypsy Girl",
-"Pippin"), path = "shortlist.txt")
-● #> Saved 3 dogs to shortlist.txt
-Saved Trixie, Gypsy Girl, and Pippin to `shortlist.txt`.
+◯ [tool call] save_shortlist(names = c("Trixie", "Gypsy Girl", "Lamb Chop"))
+● #> Saved 3 dogs to dog_shortlist.txt
+I've saved Trixie, Gypsy Girl, and Lamb Chop to your shortlist.
 ```
 
 ```{r}
-readLines("shortlist.txt")
+readLines("dog_shortlist.txt")
 ```
 
 ```
-[1] "Trixie"     "Gypsy Girl" "Pippin"
+[1] "Trixie"     "Gypsy Girl" "Lamb Chop"
 ```
+
+## When the tool errors {.smaller}
+
+```{r}
+chat$chat("Save me 2 more random dogs to the shortlist")
+```
+
+```
+◯ [tool call] save_shortlist(names = c("Roxie", "Ponce"))
+■ #> Error: File already exists, please choose a different path
+◯ [tool call] save_shortlist(names = c("Roxie", "Ponce"))
+■ #> Error: File already exists, please choose a different path
+I couldn't save Roxie and Ponce. The save tool returned "File already
+exists" on both attempts, and it doesn't let me choose a different
+file path. Your shortlist still has Trixie, Gypsy Girl, and Lamb Chop.
+```
+
+The error message goes back to the model as the tool result. It tried twice, then explained the problem to us
 
 ## A word of caution
 
@@ -1261,13 +1254,12 @@ time_tool <- tool(
 ## Should the model be allowed to do that?
 
 ```{r}
-#| code-line-numbers: "8"
+#| code-line-numbers: "7"
 save_shortlist_tool <- tool(
   save_shortlist,
   "Save a shortlist of dog names to a text file",
   arguments = list(
-    names = type_array(type_string("Dog names")),
-    path = type_string("File path to save to")
+    names = type_array(type_string("Dog names"))
   ),
   annotations = tool_annotations(read_only_hint = FALSE)
 )
@@ -1278,7 +1270,7 @@ save_shortlist_tool <- tool(
 `on_tool_request()` runs before every tool call. Return nothing to allow it, or call `tool_reject()` to block it.
 
 ```{r}
-chat <- chat_openrouter(model = "anthropic/claude-haiku-5.5", system_prompt = prompt)
+chat <- chat_openrouter(model = "anthropic/claude-haiku-5.5")
 chat$register_tool(time_tool)
 chat$register_tool(save_shortlist_tool)
 
@@ -1293,57 +1285,59 @@ chat$on_tool_request(function(request) {
 
   answer <- readline("Allow? (y/n) ")
   if (tolower(answer) != "y") {
-    tool_reject("The user did not approve this action")
+    tool_reject("The user declined when asked for approval")
   }
 })
+```
+
+## Read-only tools go straight through
+
+```{r}
+chat$chat("What's the time?")
+```
+
+```
+◯ [tool call] get_time()
+● #> Monday 09 November 2026, 14:31
+It's 2:31 PM on Monday, 9 November 2026.
 ```
 
 ## Saying no {.smaller}
 
 ```{r}
-chat$chat("Pick two adult dogs and save them to adults.txt")
+chat$chat(
+  "Pick two random adult dogs and save them to the shortlist",
+  "Here are the dogs available:",
+  content_document_file("data/dogs_details.csv")
+)
 ```
 
 ```
-◯ [tool call] save_shortlist(names = c("Gypsy Girl", "Lamb Chop"),
-path = "adults.txt")
+◯ [tool call] save_shortlist(names = c("Palang", "Aiden"))
 The model wants to run save_shortlist with arguments:
-List of 2
+List of 1
  $ names:List of 2
-  ..$ : chr "Gypsy Girl"
-  ..$ : chr "Lamb Chop"
- $ path : chr "adults.txt"
+  ..$ : chr "Palang"
+  ..$ : chr "Aiden"
 Allow? (y/n) n
-■ #> Error: Tool call rejected. The user did not approve this action
-I picked **Gypsy Girl** and **Lamb Chop**, both adult dogs. I
-couldn't save them to `adults.txt` because the save action wasn't
-approved.
+■ #> Error: Tool call rejected. The user declined when asked for approval
+I couldn't save the shortlist. The save request was rejected by the
+tool, and the error says you declined approval. If you didn't mean to
+decline, I can try again.
+
+The two adult dogs I picked are:
+1. **Palang** (Pueblo, CO): 4 years old, a sweet dog who can be shy
+at first. ...
+2. **Aiden** (Locust Fork, AL): about 5 years old, good with people
+and other dogs ...
 ```
 
-The model is told why, and carries on gracefully.
-
-## Read-only tools don't trigger the question
-
-```{r}
-chat$chat("what time is it?")
-```
-
-```
-◯ [tool call] get_time()
-● #> Saturday 07 November 2026, 15:00
-It's 3:00 PM on Saturday, November 7, 2026.
-```
-
-## Try it live
-
-```{r}
-live_console(chat)
-```
+The model is told why, and carries on gracefully
 
 ## Your turn
 
-1. Ask the assistant to save a different shortlist, and approve it this time
-2. Change the rule in `on_tool_request()` so saving is only ever allowed to files ending in `.txt`, without asking
+1. Ask the assistant to save a shortlist again, and approve it this time (delete `dog_shortlist.txt` first!)
+2. Change the rule in `on_tool_request()` so saving is allowed without asking when it's 3 dogs or fewer
 3. **Bonus:** log every tool call (name and arguments) to a data frame using `on_tool_request()`
 
 ```{r}
